@@ -3,131 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGO Mobile - Gestão Unificada</title>
+    <title>SGO - Sistema Unificado de Manutenção</title>
     <style>
         :root {
             --primary: #2563eb; --secondary: #64748b; --bg: #f1f5f9; --text: #1e293b; --white: #ffffff;
-            --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --warning: #f59e0b;
+            --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --info: #3b82f6;
         }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; height: 100vh; overflow: hidden; }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        .main-wrapper { display: flex; height: 100vh; }
 
-        /* Ajuste de Layout para Mobile */
-        .main-wrapper { 
-            display: flex; 
-            flex-direction: row; 
-            height: 100vh; 
-        }
-
-        .col { 
-            height: 100vh; 
-            overflow-y: auto; 
-            padding: 15px; 
-            border-right: 1px solid var(--border); 
-            box-sizing: border-box; 
-        }
-
-        /* Responsividade Mobile */
-        @media (max-width: 768px) {
-            .main-wrapper { 
-                flex-direction: column; /* Empilha as janelas no celular */
-                height: auto;
-                overflow-y: visible;
-            }
-            .col { 
-                width: 100% !important; /* Força largura total */
-                height: auto; 
-                border-right: none;
-                border-bottom: 2px solid var(--border);
-                padding: 20px 15px;
-            }
-            .grid-frota, .grid-inputs {
-                grid-template-columns: 1fr !important; /* Colunas únicas para facilitar o toque[cite: 1] */
-            }
-            .btn {
-                padding: 12px; /* Botões maiores para mobile[cite: 1] */
-                font-size: 0.9rem;
-            }
-            input, select, textarea {
-                font-size: 1rem; /* Evita zoom automático no iOS ao focar[cite: 1] */
-                padding: 10px;
-            }
-        }
-
-        /* Configurações de Largura Desktop[cite: 1] */
+        /* Colunas */
+        .col { height: 100vh; overflow-y: auto; padding: 15px; border-right: 1px solid var(--border); box-sizing: border-box; }
         .col-ferramentas { width: 350px; background: #fff; } 
         .col-frota { flex: 1; background: var(--bg); } 
         .col-base { width: 320px; background: #fff; border-right: none; } 
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--bg); }
-        h2 { font-size: 1.2rem; margin: 0; color: var(--primary); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
+        h2 { font-size: 1.1rem; margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
-        .form-card { background: #f8fafc; padding: 15px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; }
-        label { font-size: 0.75rem; font-weight: bold; color: var(--secondary); display: block; margin: 8px 0 3px 0; }
+        /* Formulários */
+        .form-card { background: #f8fafc; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; }
+        label { font-size: 0.65rem; font-weight: bold; color: var(--secondary); display: block; margin: 5px 0 2px 0; }
+        input, select, textarea { width: 100%; padding: 7px; border: 1px solid var(--border); border-radius: 5px; box-sizing: border-box; font-size: 0.8rem; }
         
-        .btn { border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-save { background: var(--primary); color: white; width: 100%; margin-top: 10px; padding: 10px; }
+        .btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.2s; }
+        .btn-save { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+        .btn-edit { color: var(--primary); background: none; padding: 2px; cursor: pointer; border: none; font-size: 1rem; }
+        .btn-del { color: var(--danger); background: none; padding: 2px; cursor: pointer; border: none; font-size: 1rem; }
+
+        /* Tabelas e Badges */
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }
         
-        /* Tabela Mobile Friendly[cite: 1] */
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--border); }
+        .placa-badge { background: #334155; color: white; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
         
-        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; }
-        .st-normal { background: #dcfce7; color: #166534; }
-        .st-avariada { background: #fef9c3; color: #854d0e; }
-        .st-emprestada { background: #dbeafe; color: #1e40af; }
-        .st-extraviada { background: #fee2e2; color: #991b1b; }
-        
-        .list-item { padding: 15px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        /* Cores de Status das Ferramentas */
+        .status-badge { padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
+        .st-normal { background: #dcfce7; color: #166534; }    /* Verde */
+        .st-avariada { background: #fef9c3; color: #854d0e; }  /* Amarelo */
+        .st-emprestada { background: #dbeafe; color: #1e40af; }/* Azul */
+        .st-extraviada { background: #fee2e2; color: #991b1b; }/* Vermelho */
+
+        .list-item { padding: 10px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
     <div class="main-wrapper">
-        <!-- 1. FERRAMENTAS[cite: 1] -->
+        <!-- 1. GESTÃO DE FERRAMENTAS (ESQUERDA)[cite: 1] -->
         <div class="col col-ferramentas">
-            <div class="header"><h2>🛠️ Ferramentas</h2></div>
+            <div class="header">
+                <h2>🛠️ Ferramentas</h2>
+            </div>
             <div class="form-card">
                 <input type="hidden" id="edit-ferr-id">
-                <label>Ferramenta:</label><input type="text" id="ferr-nome">
-                <label>Linha:</label><input type="text" id="ferr-linha">
-                <label>Status:</label>
-                <select id="ferr-status">
-                    <option value="Normal">Normal</option>
-                    <option value="Avariada">Avariada</option>
-                    <option value="Emprestada">Emprestada</option>
-                    <option value="Extraviada">Extraviada</option>
-                </select>
-                <button class="btn btn-save" onclick="salvarFerramenta()">Salvar</button>
+                <label>Ferramenta:</label><input type="text" id="ferr-nome" placeholder="Ex: Multímetro">
+                <div style="display:flex; gap:5px;">
+                    <div style="flex:1"><label>Linha:</label><input type="text" id="ferr-linha"></div>
+                    <div style="flex:1"><label>Base:</label><input type="text" id="ferr-base"></div>
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <div style="flex:1"><label>Categoria:</label><input type="text" id="ferr-cat"></div>
+                    <div style="flex:1">
+                        <label>Status:</label>
+                        <select id="ferr-status">
+                            <option value="Normal">Normal</option>
+                            <option value="Avariada">Avariada</option>
+                            <option value="Emprestada">Emprestada</option>
+                            <option value="Extraviada">Extraviada</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-save" style="background:var(--warning)" onclick="salvarFerramenta()">Salvar Ferramenta</button>
             </div>
             <div id="lista-ferramentas"></div>
         </div>
 
-        <!-- 2. FROTA[cite: 1] -->
+        <!-- 2. GESTÃO DE FROTA (CENTRO)[cite: 1] -->
         <div class="col col-frota">
-            <div class="header"><h2>🚚 Frota</h2></div>
-            <div class="form-card">
+            <div class="header">
+                <h2>🚚 Frota de Veículos</h2>
+            </div>
+            <div class="form-card" style="background:white;">
                 <input type="hidden" id="edit-frota-id">
-                <label>Placa:</label><input type="text" id="f-placa">
-                <label>Modelo:</label><input type="text" id="f-fabricante">
-                <button class="btn btn-save" onclick="salvarFrota()">Registrar</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                    <div><label>Placa:</label><input type="text" id="f-placa"></div>
+                    <div><label>Modelo:</label><input type="text" id="f-fabricante"></div>
+                    <div><label>Responsável:</label><input type="text" id="f-responsabilidade"></div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:8px;">
+                    <div><label>Local:</label><input type="text" id="f-posicionamento"></div>
+                    <div><label>Observação:</label><input type="text" id="f-observacao"></div>
+                </div>
+                <button class="btn btn-save" onclick="salvarFrota()">Registrar Veículo</button>
             </div>
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Placa</th><th>Modelo</th><th>Ações</th></tr></thead>
-                    <tbody id="tabela-frota"></tbody>
-                </table>
-            </div>
+            <table>
+                <thead><tr><th>Placa</th><th>Modelo</th><th>Responsável</th><th>Ações</th></tr></thead>
+                <tbody id="tabela-frota"></tbody>
+            </table>
         </div>
 
-        <!-- 3. BASES[cite: 1] -->
+        <!-- 3. BASE DE MANUTENÇÃO (DIREITA)[cite: 1] -->
         <div class="col col-base">
-            <div class="header"><h2>📋 Bases</h2></div>
+            <div class="header">
+                <h2>📋 Bases</h2>
+            </div>
             <div class="form-card">
                 <input type="hidden" id="edit-base-id">
-                <label>Nome:</label><input type="text" id="b-base">
-                <button class="btn btn-save" onclick="salvarBase()">Cadastrar</button>
+                <label>Nome da Base:</label><input type="text" id="b-base">
+                <div style="display:flex; gap:5px;">
+                    <div style="flex:1"><label>Linha:</label><input type="text" id="b-linha"></div>
+                    <div style="flex:1"><label>Sigla:</label><input type="text" id="b-sigla"></div>
+                </div>
+                <button class="btn btn-save" style="background:var(--success)" onclick="salvarBase()">Cadastrar Base</button>
             </div>
             <div id="lista-bases"></div>
         </div>
@@ -135,8 +124,149 @@
 
     <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
     <script>
-        /* A lógica de JS permanece a mesma enviada anteriormente, 
-           garantindo a funcionalidade de CRUD para as três coleções[cite: 1] */
+        const { Client, Databases, ID } = Appwrite;
+        const client = new Client().setEndpoint('https://syd.cloud.appwrite.io/v1').setProject('69e0dbe500145c5ba8c3');
+        const databases = new Databases(client);
+        const DB = "69e0def3001636121611";
+        
+        const COL_FERR = "liferramentas"; 
+        const COL_FROTA = "lifrota";
+        const COL_BASE = "limanutencaomef";
+
+        // Função para retornar a classe CSS do status
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Normal': return 'st-normal';
+                case 'Avariada': return 'st-avariada';
+                case 'Emprestada': return 'st-emprestada';
+                case 'Extraviada': return 'st-extraviada';
+                default: return '';
+            }
+        }
+
+        // --- LÓGICA FERRAMENTAS ---
+        async function carregarFerramentas() {
+            const res = await databases.listDocuments(DB, COL_FERR);
+            document.getElementById('lista-ferramentas').innerHTML = res.documents.map(doc => `
+                <div class="list-item">
+                    <div>
+                        <div style="font-weight:bold;">${doc.ferramenta}</div>
+                        <div style="font-size:0.65rem; color:var(--secondary)">${doc.linha} | ${doc.base} | ${doc.categoria}</div>
+                        <span class="status-badge ${getStatusClass(doc.status)}">${doc.status}</span>
+                    </div>
+                    <div>
+                        <button class="btn-edit" onclick="prepararFerramenta('${doc.$id}','${doc.linha}','${doc.base}','${doc.categoria}','${doc.ferramenta}','${doc.status}')">✏️</button>
+                        <button class="btn-del" onclick="remover('${COL_FERR}', '${doc.$id}')">🗑️</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function salvarFerramenta() {
+            const id = document.getElementById('edit-ferr-id').value;
+            const dados = {
+                linha: document.getElementById('ferr-linha').value,
+                base: document.getElementById('ferr-base').value,
+                categoria: document.getElementById('ferr-cat').value,
+                ferramenta: document.getElementById('ferr-nome').value,
+                status: document.getElementById('ferr-status').value
+            };
+            if(!dados.ferramenta) return alert("Nome da ferramenta obrigatório");
+            id ? await databases.updateDocument(DB, COL_FERR, id, dados) : await databases.createDocument(DB, COL_FERR, ID.unique(), dados);
+            resetForms(); carregarFerramentas();
+        }
+
+        function prepararFerramenta(id, l, b, c, f, s) {
+            document.getElementById('edit-ferr-id').value = id;
+            document.getElementById('ferr-linha').value = l;
+            document.getElementById('ferr-base').value = b;
+            document.getElementById('ferr-cat').value = c;
+            document.getElementById('ferr-nome').value = f;
+            document.getElementById('ferr-status').value = s;
+        }
+
+        // --- LÓGICA FROTA ---
+        async function carregarFrota() {
+            const res = await databases.listDocuments(DB, COL_FROTA);
+            document.getElementById('tabela-frota').innerHTML = res.documents.map(doc => `
+                <tr>
+                    <td><span class="placa-badge">${doc.placa}</span></td>
+                    <td>${doc.fabricante}</td>
+                    <td>${doc.responsabilidade}</td>
+                    <td>
+                        <button class="btn-edit" onclick="prepararFrota('${doc.$id}','${doc.placa}','${doc.fabricante}','${doc.responsabilidade}','${doc.posicionamento}','${doc.observacao}')">✏️</button>
+                        <button class="btn-del" onclick="remover('${COL_FROTA}', '${doc.$id}')">🗑️</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        async function salvarFrota() {
+            const id = document.getElementById('edit-frota-id').value;
+            const dados = {
+                placa: document.getElementById('f-placa').value,
+                fabricante: document.getElementById('f-fabricante').value,
+                responsabilidade: document.getElementById('f-responsabilidade').value,
+                posicionamento: document.getElementById('f-posicionamento').value,
+                observacao: document.getElementById('f-observacao').value
+            };
+            id ? await databases.updateDocument(DB, COL_FROTA, id, dados) : await databases.createDocument(DB, COL_FROTA, ID.unique(), dados);
+            resetForms(); carregarFrota();
+        }
+
+        function prepararFrota(id, p, f, r, pos, o) {
+            document.getElementById('edit-frota-id').value = id;
+            document.getElementById('f-placa').value = p;
+            document.getElementById('f-fabricante').value = f;
+            document.getElementById('f-responsabilidade').value = r;
+            document.getElementById('f-posicionamento').value = pos;
+            document.getElementById('f-observacao').value = o;
+        }
+
+        // --- LÓGICA BASES ---
+        async function carregarBases() {
+            const res = await databases.listDocuments(DB, COL_BASE);
+            document.getElementById('lista-bases').innerHTML = res.documents.map(doc => `
+                <div class="list-item">
+                    <div><strong>${doc.base}</strong><br><small>${doc.linha} | ${doc.sigla}</small></div>
+                    <div>
+                        <button class="btn-edit" onclick="prepararBase('${doc.$id}','${doc.base}','${doc.linha}','${doc.sigla}')">✏️</button>
+                        <button class="btn-del" onclick="remover('${COL_BASE}', '${doc.$id}')">🗑️</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function salvarBase() {
+            const id = document.getElementById('edit-base-id').value;
+            const dados = {
+                base: document.getElementById('b-base').value,
+                linha: document.getElementById('b-linha').value,
+                sigla: document.getElementById('b-sigla').value
+            };
+            id ? await databases.updateDocument(DB, COL_BASE, id, dados) : await databases.createDocument(DB, COL_BASE, ID.unique(), dados);
+            resetForms(); carregarBases();
+        }
+
+        function prepararBase(id, b, l, s) {
+            document.getElementById('edit-base-id').value = id;
+            document.getElementById('b-base').value = b;
+            document.getElementById('b-linha').value = l;
+            document.getElementById('b-sigla').value = s;
+        }
+
+        // --- AUXILIARES ---
+        async function remover(col, id) {
+            if(!confirm("Excluir registro?")) return;
+            await databases.deleteDocument(DB, col, id);
+            carregarFerramentas(); carregarFrota(); carregarBases();
+        }
+
+        function resetForms() {
+            const ids = ['edit-ferr-id','edit-frota-id','edit-base-id'];
+            ids.forEach(id => document.getElementById(id).value = "");
+            document.querySelectorAll('input').forEach(i => i.value = "");
+        }
+
+        // Início
+        carregarFerramentas(); carregarFrota(); carregarBases();
     </script>
 </body>
 </html>

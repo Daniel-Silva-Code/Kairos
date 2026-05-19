@@ -1,272 +1,222 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGO - Sistema Unificado de Manutenção</title>
-    <style>
-        :root {
-            --primary: #2563eb; --secondary: #64748b; --bg: #f1f5f9; --text: #1e293b; --white: #ffffff;
-            --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --info: #3b82f6;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; height: 100vh; overflow: hidden; }
-        
-        .main-wrapper { display: flex; height: 100vh; }
-
-        /* Colunas */
-        .col { height: 100vh; overflow-y: auto; padding: 15px; border-right: 1px solid var(--border); box-sizing: border-box; }
-        .col-ferramentas { width: 350px; background: #fff; } 
-        .col-frota { flex: 1; background: var(--bg); } 
-        .col-base { width: 320px; background: #fff; border-right: none; } 
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
-        h2 { font-size: 1.1rem; margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-
-        /* Formulários */
-        .form-card { background: #f8fafc; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; }
-        label { font-size: 0.65rem; font-weight: bold; color: var(--secondary); display: block; margin: 5px 0 2px 0; }
-        input, select, textarea { width: 100%; padding: 7px; border: 1px solid var(--border); border-radius: 5px; box-sizing: border-box; font-size: 0.8rem; }
-        
-        .btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.2s; }
-        .btn-save { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
-        .btn-edit { color: var(--primary); background: none; padding: 2px; cursor: pointer; border: none; font-size: 1rem; }
-        .btn-del { color: var(--danger); background: none; padding: 2px; cursor: pointer; border: none; font-size: 1rem; }
-
-        /* Tabelas e Badges */
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }
-        
-        .placa-badge { background: #334155; color: white; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
-        
-        /* Cores de Status das Ferramentas */
-        .status-badge { padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
-        .st-normal { background: #dcfce7; color: #166534; }    /* Verde */
-        .st-avariada { background: #fef9c3; color: #854d0e; }  /* Amarelo */
-        .st-emprestada { background: #dbeafe; color: #1e40af; }/* Azul */
-        .st-extraviada { background: #fee2e2; color: #991b1b; }/* Vermelho */
-
-        .list-item { padding: 10px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
-    </style>
+    <title>Dashboard Linha</title>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+    <header>
+        <div class="header-left">
 
-    <div class="main-wrapper">
-        <!-- 1. GESTÃO DE FERRAMENTAS (ESQUERDA)[cite: 1] -->
-        <div class="col col-ferramentas">
-            <div class="header">
-                <h2>🛠️ Ferramentas</h2>
+            <div class="logo-placeholder"><i class="fi-rr-train"></i></div>
+            <h1>Linha</h1>
+            <div class="line-circles">
+                <div class="circle">8</div>
+                <div class="circle active">9</div>
             </div>
-            <div class="form-card">
-                <input type="hidden" id="edit-ferr-id">
-                <label>Ferramenta:</label><input type="text" id="ferr-nome" placeholder="Ex: Multímetro">
-                <div style="display:flex; gap:5px;">
-                    <div style="flex:1"><label>Linha:</label><input type="text" id="ferr-linha"></div>
-                    <div style="flex:1"><label>Base:</label><input type="text" id="ferr-base"></div>
-                </div>
-                <div style="display:flex; gap:5px;">
-                    <div style="flex:1"><label>Categoria:</label><input type="text" id="ferr-cat"></div>
-                    <div style="flex:1">
-                        <label>Status:</label>
-                        <select id="ferr-status">
-                            <option value="Normal">Normal</option>
-                            <option value="Avariada">Avariada</option>
-                            <option value="Emprestada">Emprestada</option>
-                            <option value="Extraviada">Extraviada</option>
-                        </select>
+        </div>
+        <div class="header-right">
+            <div><strong>Ghost</strong><br><small>Usuário</small></div>
+            <div class="user-avatar">
+                <i class="fi-rr-user"></i>
+            </div>
+        </div>
+    </header>
+    <div class="leiaute">
+        <div class="main-container">
+            <div class="col-base">
+                <div class="section-title">Base</div>
+                <div class="vtr-carrousel">
+                    <div class="vtr-card">
+                        <div class="vtr-header">
+                            <span>VTR</span>
+                            <span>{status}</span>
+                        </div>
+                        <div class="vtr-details">
+                            {fabricante} &nbsp;&nbsp; Nível de combustível<br>
+                            <b>{placa}</b> &nbsp;&nbsp; <b>{ncombust}</b><br>
+                            <small>Diário de Bordo: <span
+                                    style="color:var(--accent-teal)">{diariobordo}</span></small><br>
+                            <small>Cartão abastecimento: <span
+                                    style="color:var(--accent-teal)">{cartaoabast}</span></small>
+                        </div>
                     </div>
                 </div>
-                <button class="btn btn-save" style="background:var(--warning)" onclick="salvarFerramenta()">Salvar Ferramenta</button>
-            </div>
-            <div id="lista-ferramentas"></div>
-        </div>
+                <div class="pendencia-header">
+                    <div class="section-title" style="margin:0">Pendência</div>
+                    <div style="color: var(--accent-teal); font-size: 1.5em; font-weight: bold;">
+                        <i class="fi-rr-plus"></i>
+                        <i class="fi-rr-filter"></i>
+                    </div>
+                </div>
 
-        <!-- 2. GESTÃO DE FROTA (CENTRO)[cite: 1] -->
-        <div class="col col-frota">
-            <div class="header">
-                <h2>🚚 Frota de Veículos</h2>
-            </div>
-            <div class="form-card" style="background:white;">
-                <input type="hidden" id="edit-frota-id">
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
-                    <div><label>Placa:</label><input type="text" id="f-placa"></div>
-                    <div><label>Modelo:</label><input type="text" id="f-fabricante"></div>
-                    <div><label>Responsável:</label><input type="text" id="f-responsabilidade"></div>
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:8px;">
-                    <div><label>Local:</label><input type="text" id="f-posicionamento"></div>
-                    <div><label>Observação:</label><input type="text" id="f-observacao"></div>
-                </div>
-                <button class="btn btn-save" onclick="salvarFrota()">Registrar Veículo</button>
-            </div>
-            <table>
-                <thead><tr><th>Placa</th><th>Modelo</th><th>Responsável</th><th>Ações</th></tr></thead>
-                <tbody id="tabela-frota"></tbody>
-            </table>
-        </div>
+                <div class="container">
+                    <div class="list">
+                        <!-- CARD -->
+                        <div class="card">
+                            <div class="left">
+                                <div class="column">
+                                    <h3>{descritivo}</h3>
+                                    <small>{sistema}</small>
+                                    <div class="tags">
+                                        <div class="tag">{sigla}</div>
+                                        <div class="tag">{responsavel}</div>
+                                    </div>
+                                    <div class="created">
+                                        Criado: {data-criacao}
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <h3>{tipo}</h3>
+                                    <small>{ordem}</small>
+                                </div>
+                                <div class="column">
+                                    <h3>Relato</h3>
+                                    <p>
+                                        {relato}
+                                    </p>
+                                </div>
+                                <div class="column">
+                                    <h3>Ações</h3>
+                                    <p>
+                                        {acao}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <div class="status">
+                                    {status}
+                                </div>
+                                <div class="update">
+                                    Última modificação
+                                    <i class="fi-rr-edit"></i>
+                                    <br>
+                                    {modificacao}
+                                </div>
+                            </div>
+                        </div>
 
-        <!-- 3. BASE DE MANUTENÇÃO (DIREITA)[cite: 1] -->
-        <div class="col col-base">
-            <div class="header">
-                <h2>📋 Bases</h2>
-            </div>
-            <div class="form-card">
-                <input type="hidden" id="edit-base-id">
-                <label>Nome da Base:</label><input type="text" id="b-base">
-                <div style="display:flex; gap:5px;">
-                    <div style="flex:1"><label>Linha:</label><input type="text" id="b-linha"></div>
-                    <div style="flex:1"><label>Sigla:</label><input type="text" id="b-sigla"></div>
+
+                    </div>
                 </div>
-                <button class="btn btn-save" style="background:var(--success)" onclick="salvarBase()">Cadastrar Base</button>
             </div>
-            <div id="lista-bases"></div>
+
+            <div class="col-equip">
+                <div class="equip-title">Equipamentos - Estação</div>
+                <div class="sigla-tabs">
+                    <div class="sigla-tag">{Sigla}</div>
+                    <div class="sigla-tag">{Sigla}</div>
+                    <div class="sigla-tag">{Sigla}</div>
+                    <div class="sigla-tag">{Sigla}</div>
+                </div>
+
+                <div class="equip-card">
+                    <div>
+                        <span style="font-weight:bold; font-size:9pt;">{sigla} - {equipamento}</span><br>
+                        <small style="color:var(--text-light)">{Sistema}</small>
+                    </div>
+                    <span style="font-weight:bold; font-size:9pt;">{Status}</span>
+                </div>
+
+                <div class="equip-card red">
+                    <div>
+                        <span style="font-weight:bold; font-size:9pt;">{equipamento}</span><br>
+                        <small style="color:var(--text-light)">{Sistema}</small>
+                    </div>
+                    <span style="font-weight:bold; font-size:9pt;">{Status}</span>
+                </div>
+            </div>
+
+            <div class="col-dash">
+                <div class="metric-item">
+                    <div class="metric-header"><span>EPC</span> <span>{disponibilidade}%</span></div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: 80%;"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>❌{faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                        <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                    </div>
+                </div>
+
+                <div class="metric-item">
+                    <div class="metric-header"><span>Instrumentos</span> <span>{disponibilidade}%</span></div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: 70%;"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>❌ {faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                        <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                    </div>
+                </div>
+
+                <div class="metric-item">
+                    <div class="metric-header"><span>Ferramentas</span> <span>{disponibilidade}%</span></div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: 70%;"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>❌ {faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                        <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                    </div>
+                </div>
+
+                <div class="metric-item">
+                    <div class="metric-header"><span>Insumos</span> <span>{disponibilidade}%</span></div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: 70%;"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>❌ {faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                        <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                    </div>
+                </div>
+
+                <div class="tarefas-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:bold; font-size:14pt;">Tarefas</span>
+                        <span class="add-btn">+</span>
+                    </div>
+
+                    <div class="tarefa-card">
+                        <span style="font-size:9pt;">{descritivo}</span>
+                        <span class="tarefa-status" style="background:var(--status-red)">{status}</span>
+                    </div>
+                    <div class="tarefa-card">
+                        <span style="font-size:9pt;">{descritivo}</span>
+                        <span class="tarefa-status" style="background:var(--status-blue)">{status}</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
+        <nav class="external-nav">
+            <div class="circulo-nav ativo">
+                <i class="fi fi-rr-stats"></i>
+            </div>
+            <div class="circulo-nav">
+                <i class="fi fi-rr-apps"></i>
+            </div>
+            <div class="circulo-nav">
+                <i class="fi fi-rr-settings"></i>
+            </div>
+            <div class="circulo-nav">
+                <i class="fi fi-rr-user"></i>
+            </div>
+        </nav>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
-    <script>
-        const { Client, Databases, ID } = Appwrite;
-        const client = new Client().setEndpoint('https://syd.cloud.appwrite.io/v1').setProject('69e0dbe500145c5ba8c3');
-        const databases = new Databases(client);
-        const DB = "69e0def3001636121611";
-        
-        const COL_FERR = "liferramentas"; 
-        const COL_FROTA = "lifrota";
-        const COL_BASE = "limanutencaomef";
-
-        // Função para retornar a classe CSS do status
-        function getStatusClass(status) {
-            switch(status) {
-                case 'Normal': return 'st-normal';
-                case 'Avariada': return 'st-avariada';
-                case 'Emprestada': return 'st-emprestada';
-                case 'Extraviada': return 'st-extraviada';
-                default: return '';
-            }
-        }
-
-        // --- LÓGICA FERRAMENTAS ---
-        async function carregarFerramentas() {
-            const res = await databases.listDocuments(DB, COL_FERR);
-            document.getElementById('lista-ferramentas').innerHTML = res.documents.map(doc => `
-                <div class="list-item">
-                    <div>
-                        <div style="font-weight:bold;">${doc.ferramenta}</div>
-                        <div style="font-size:0.65rem; color:var(--secondary)">${doc.linha} | ${doc.base} | ${doc.categoria}</div>
-                        <span class="status-badge ${getStatusClass(doc.status)}">${doc.status}</span>
-                    </div>
-                    <div>
-                        <button class="btn-edit" onclick="prepararFerramenta('${doc.$id}','${doc.linha}','${doc.base}','${doc.categoria}','${doc.ferramenta}','${doc.status}')">✏️</button>
-                        <button class="btn-del" onclick="remover('${COL_FERR}', '${doc.$id}')">🗑️</button>
-                    </div>
-                </div>`).join('');
-        }
-
-        async function salvarFerramenta() {
-            const id = document.getElementById('edit-ferr-id').value;
-            const dados = {
-                linha: document.getElementById('ferr-linha').value,
-                base: document.getElementById('ferr-base').value,
-                categoria: document.getElementById('ferr-cat').value,
-                ferramenta: document.getElementById('ferr-nome').value,
-                status: document.getElementById('ferr-status').value
-            };
-            if(!dados.ferramenta) return alert("Nome da ferramenta obrigatório");
-            id ? await databases.updateDocument(DB, COL_FERR, id, dados) : await databases.createDocument(DB, COL_FERR, ID.unique(), dados);
-            resetForms(); carregarFerramentas();
-        }
-
-        function prepararFerramenta(id, l, b, c, f, s) {
-            document.getElementById('edit-ferr-id').value = id;
-            document.getElementById('ferr-linha').value = l;
-            document.getElementById('ferr-base').value = b;
-            document.getElementById('ferr-cat').value = c;
-            document.getElementById('ferr-nome').value = f;
-            document.getElementById('ferr-status').value = s;
-        }
-
-        // --- LÓGICA FROTA ---
-        async function carregarFrota() {
-            const res = await databases.listDocuments(DB, COL_FROTA);
-            document.getElementById('tabela-frota').innerHTML = res.documents.map(doc => `
-                <tr>
-                    <td><span class="placa-badge">${doc.placa}</span></td>
-                    <td>${doc.fabricante}</td>
-                    <td>${doc.responsabilidade}</td>
-                    <td>
-                        <button class="btn-edit" onclick="prepararFrota('${doc.$id}','${doc.placa}','${doc.fabricante}','${doc.responsabilidade}','${doc.posicionamento}','${doc.observacao}')">✏️</button>
-                        <button class="btn-del" onclick="remover('${COL_FROTA}', '${doc.$id}')">🗑️</button>
-                    </td>
-                </tr>`).join('');
-        }
-
-        async function salvarFrota() {
-            const id = document.getElementById('edit-frota-id').value;
-            const dados = {
-                placa: document.getElementById('f-placa').value,
-                fabricante: document.getElementById('f-fabricante').value,
-                responsabilidade: document.getElementById('f-responsabilidade').value,
-                posicionamento: document.getElementById('f-posicionamento').value,
-                observacao: document.getElementById('f-observacao').value
-            };
-            id ? await databases.updateDocument(DB, COL_FROTA, id, dados) : await databases.createDocument(DB, COL_FROTA, ID.unique(), dados);
-            resetForms(); carregarFrota();
-        }
-
-        function prepararFrota(id, p, f, r, pos, o) {
-            document.getElementById('edit-frota-id').value = id;
-            document.getElementById('f-placa').value = p;
-            document.getElementById('f-fabricante').value = f;
-            document.getElementById('f-responsabilidade').value = r;
-            document.getElementById('f-posicionamento').value = pos;
-            document.getElementById('f-observacao').value = o;
-        }
-
-        // --- LÓGICA BASES ---
-        async function carregarBases() {
-            const res = await databases.listDocuments(DB, COL_BASE);
-            document.getElementById('lista-bases').innerHTML = res.documents.map(doc => `
-                <div class="list-item">
-                    <div><strong>${doc.base}</strong><br><small>${doc.linha} | ${doc.sigla}</small></div>
-                    <div>
-                        <button class="btn-edit" onclick="prepararBase('${doc.$id}','${doc.base}','${doc.linha}','${doc.sigla}')">✏️</button>
-                        <button class="btn-del" onclick="remover('${COL_BASE}', '${doc.$id}')">🗑️</button>
-                    </div>
-                </div>`).join('');
-        }
-
-        async function salvarBase() {
-            const id = document.getElementById('edit-base-id').value;
-            const dados = {
-                base: document.getElementById('b-base').value,
-                linha: document.getElementById('b-linha').value,
-                sigla: document.getElementById('b-sigla').value
-            };
-            id ? await databases.updateDocument(DB, COL_BASE, id, dados) : await databases.createDocument(DB, COL_BASE, ID.unique(), dados);
-            resetForms(); carregarBases();
-        }
-
-        function prepararBase(id, b, l, s) {
-            document.getElementById('edit-base-id').value = id;
-            document.getElementById('b-base').value = b;
-            document.getElementById('b-linha').value = l;
-            document.getElementById('b-sigla').value = s;
-        }
-
-        // --- AUXILIARES ---
-        async function remover(col, id) {
-            if(!confirm("Excluir registro?")) return;
-            await databases.deleteDocument(DB, col, id);
-            carregarFerramentas(); carregarFrota(); carregarBases();
-        }
-
-        function resetForms() {
-            const ids = ['edit-ferr-id','edit-frota-id','edit-base-id'];
-            ids.forEach(id => document.getElementById(id).value = "");
-            document.querySelectorAll('input').forEach(i => i.value = "");
-        }
-
-        // Início
-        carregarFerramentas(); carregarFrota(); carregarBases();
-    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>

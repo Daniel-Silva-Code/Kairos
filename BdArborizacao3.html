@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hierarchy Manager Pro</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f1f5f9;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 20px; }
+
+        /* Container Principal com área de clique expandida */
+        .tree-container { 
+            min-height: 400px; 
+            max-width: 800px; 
+            background: var(--white); 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+
+        /* Reset de detalhes e retorno da Seta Azul */
+        details { margin-left: 20px; position: relative; transition: all 0.3s; }
+        
+        summary { 
+            padding: 8px 12px; 
+            cursor: pointer; 
+            list-style: none; 
+            display: flex; 
+            align-items: center;
+            outline: none;
+            border-radius: 6px;
+        }
+
+        summary:hover { background: #f8fafc; }
+
+        /* A Seta Azul Dinâmica */
+        summary::before {
+            content: "▶";
+            display: inline-block;
+            width: 1.2em;
+            font-size: 0.7em;
+            color: var(--primary);
+            transition: transform 0.2s ease;
+            margin-right: 5px;
+        }
+
+        details[open] > summary::before {
+            transform: rotate(90deg);
+        }
+
+        .folder-icon::after { content: " 📁"; }
+        details[open] > summary .folder-icon::after { content: " 📂"; }
+
+        .item-leaf { 
+            padding: 6px 12px 6px 40px; 
+            color: #64748b; 
+            font-size: 0.95em;
+            cursor: context-menu;
+        }
+
+        /* Menu de Contexto Customizado */
+        #ctx-menu {
+            position: absolute;
+            background: var(--white);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            display: none;
+            z-index: 9999;
+            width: 180px;
+            overflow: hidden;
+        }
+
+        .menu-opt {
+            padding: 12px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-opt:hover { background: #f1f5f9; color: var(--primary); }
+        .menu-opt.del { color: #ef4444; border-top: 1px solid #f1f5f9; }
+    </style>
+</head>
+<body>
+
+    <div class="tree-container" id="app-canvas">
+        <h2 style="margin-top:0">📂 Sistema de Arquivos</h2>
+        <p style="font-size: 0.8em; color: #94a3b8;">Botão direito para gerenciar pastas e arquivos</p>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin-bottom: 20px;">
+        
+        <div id="tree-root">
+            <!-- As pastas entrarão aqui -->
+            <details>
+                <summary><span class="folder-icon">Meu Primeiro Projeto</span></summary>
+                <div class="item-leaf">config.js</div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Menu de Contexto -->
+    <div id="ctx-menu">
+        <div class="menu-opt" onclick="execAction('create-folder')"><span>📁</span> Nova Pasta</div>
+        <div class="menu-opt" onclick="execAction('create-file')"><span>📄</span> Novo Arquivo</div>
+        <div class="menu-opt" onclick="execAction('rename')"><span>✏️</span> Renomear</div>
+        <div class="menu-opt del" onclick="execAction('delete')"><span>🗑️</span> Excluir</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('app-canvas');
+        const menu = document.getElementById('ctx-menu');
+        const root = document.getElementById('tree-root');
+        let targetElement = null;
+
+        // Gerenciador de clique direito
+        document.addEventListener('contextmenu', (e) => {
+            // Verifica se clicou em algo específico ou no fundo branco
+            const clickedOn = e.target.closest('summary') || e.target.closest('.item-leaf');
+            
+            if (e.target.closest('#app-canvas')) {
+                e.preventDefault();
+                targetElement = clickedOn; // Se for null, o alvo é a raiz
+                
+                menu.style.display = 'block';
+                menu.style.left = `${e.pageX}px`;
+                menu.style.top = `${e.pageY}px`;
+            } else {
+                menu.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', () => menu.style.display = 'none');
+
+        function execAction(action) {
+            if (action === 'create-folder') {
+                const name = prompt("Nome da pasta:");
+                if (!name) return;
+                
+                const newFolder = document.createElement('details');
+                newFolder.innerHTML = `<summary><span class="folder-icon">${name}</span></summary>`;
+                
+                // Se clicou numa pasta, adiciona dentro dela. Se clicou no vazio, adiciona na raiz.
+                if (targetElement && targetElement.tagName === 'SUMMARY') {
+                    targetElement.parentElement.appendChild(newFolder);
+                    targetElement.parentElement.open = true;
+                } else {
+                    root.appendChild(newFolder);
+                }
+            }
+
+            if (action === 'create-file') {
+                const name = prompt("Nome do arquivo:");
+                if (!name) return;
+                const file = document.createElement('div');
+                file.className = 'item-leaf';
+                file.innerText = name;
+                
+                if (targetElement && targetElement.tagName === 'SUMMARY') {
+                    targetElement.parentElement.appendChild(file);
+                    targetElement.parentElement.open = true;
+                } else {
+                    root.appendChild(file);
+                }
+            }
+
+            if (action === 'rename' && targetElement) {
+                const span = targetElement.querySelector('.folder-icon');
+                const oldName = span ? span.innerText : targetElement.innerText;
+                const newName = prompt("Renomear para:", oldName);
+                if (newName) {
+                    if (span) span.innerText = newName;
+                    else targetElement.innerText = newName;
+                }
+            }
+
+            if (action === 'delete' && targetElement) {
+                if (confirm("Tem certeza?")) {
+                    const toDelete = targetElement.tagName === 'SUMMARY' ? targetElement.parentElement : targetElement;
+                    toDelete.remove();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

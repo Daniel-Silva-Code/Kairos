@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Linha</title>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-left">
+
+            <div class="logo-placeholder"><i class="fi-rr-train"></i></div>
+            <h1>Linha</h1>
+            <div class="line-circles">
+                <div class="circle">8</div>
+                <div class="circle active">9</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div><strong>Ghost</strong><br><small>Usuário</small></div>
+            <div class="user-avatar">
+                <i class="fi-rr-user"></i>
+            </div>
+        </div>
+    </header>
+    <div class="leiaute">
+        <div class="main-container">
+            <div class="painel-view active" id="view-stats">
+                <div class="janela-stats">
+                    <div class="col-base">
+                        <div class="section-title">
+                            <div class="select-customizado">
+                                <!-- O "gatilho" que mostra a opção selecionada atual -->
+                                <div class="select-gatilho">
+                                    <span>Selecione a base...</span>
+                                    <div class="seta-icone"></div>
+                                </div>
+
+                                <!-- A lista de opções que você agora PODE customizar à vontade -->
+                                <div class="select-opcoes">
+                                    <div class="opcao" data-value="javascript">JavaScript</div>
+                                    <div class="opcao" data-value="python">Python</div>
+                                    <div class="opcao" data-value="php">PHP</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vtr-carrousel">
+                            <div class="vtr-add-card">
+                                <i class="fi-rr-plus"></i>
+                            </div>
+                            <div class="vtr-card">
+                                <div class="vtr-header">
+                                    <span>VTR <span>{sigla}</span></span>
+                                    <span>{status}</span>
+                                </div>
+                                <div class="vtr-details">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <h3>
+                                            {fabricante}
+                                        </h3>
+                                        <h3>
+                                            Combustível
+                                        </h3>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <b>{placa}</b><b>{ncombust}</b>
+                                    </div>
+                                    <small>Diário de Bordo: <span
+                                            style="color:var(--accent-teal)">{diariobordo}</span></small><br>
+                                    <small>Cartão abastecimento: <span
+                                            style="color:var(--accent-teal)">{cartaoabast}</span></small>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="pendencia-header" style="display: flex; align-items: center; width: 100%;">
+                            <h2><i class="fi fi-rr-boxes"></i> Histórico de Pendências</h2>
+
+                            <button id="btn-abrir-add-pend" class="btn-filter-equip"
+                                style="margin-left: auto; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 20px; font-size: 8.5pt;">
+                                <i class="fi fi-rr-plus"></i> Nova Pendência
+                            </button>
+                        </div>
+
+                        <div class="container">
+                            <div class="list">
+                                <!-- CARD -->
+                                <div class="card">
+                                    <div class="left">
+                                        <div class="column">
+                                            <h3>{descritivo}</h3>
+                                            <small>{sistema}</small>
+                                            <div class="tags">
+                                                <div class="tag">{sigla}</div>
+                                                <div class="tag">{responsavel}</div>
+                                            </div>
+                                            <div class="created">
+                                                Criado: {data-criacao}
+                                            </div>
+                                        </div>
+                                        <div class="column">
+                                            <h3>{tipo}</h3>
+                                            <small>{ordem}</small>
+                                        </div>
+                                        <div class="column">
+                                            <h3>Relato</h3>
+                                            <p>
+                                                {relato}
+                                            </p>
+                                        </div>
+                                        <div class="column">
+                                            <h3>Ações</h3>
+                                            <p>
+                                                {acao}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="right">
+                                        <div class="status">
+                                            {status}
+                                        </div>
+                                        <div class="update">
+                                            Última modificação
+                                            <i class="fi-rr-edit"></i>
+                                            <br>
+                                            {modificacao}
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-equip">
+                        <div class="equip-title">Equipamentos - Estação</div>
+                        <div class="sigla-tabs">
+                            <div class="sigla-tag">{Sigla}</div>
+                            <div class="sigla-tag">{Sigla}</div>
+                            <div class="sigla-tag">{Sigla}</div>
+                            <div class="sigla-tag">{Sigla}</div>
+                        </div>
+
+                        <div class="siglas-container">
+                        </div>
+
+                        <div class="equip-filters-row">
+                            <button class="btn-filter-equip active" data-status="Todos">Todos</button>
+                            <button class="btn-filter-equip" data-status="Normal">Normal</button>
+                            <button class="btn-filter-equip" data-status="Inoperante">Inoperante</button>
+                        </div>
+
+                        <div class="equip-cards-container">
+                        </div>
+
+                        <div class="equip-card">
+                            <div>
+                                <span style="font-weight:bold; font-size:9pt;">{sigla} - {equipamento}</span><br>
+                                <small style="color:var(--text-light)">{Sistema}</small>
+                            </div>
+                            <span style="font-weight:bold; font-size:9pt;">{Status}</span>
+                        </div>
+
+                        <div class="equip-card red">
+                            <div>
+                                <span style="font-weight:bold; font-size:9pt;">{equipamento}</span><br>
+                                <small style="color:var(--text-light)">{Sistema}</small>
+                            </div>
+                            <span style="font-weight:bold; font-size:9pt;">{Status}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-dash">
+                        <div class="metric-item">
+                            <div class="metric-header"><span>EPC</span> <span>{disponibilidade}%</span></div>
+                            <div class="metric-bar-bg">
+                                <div class="metric-bar-fill" style="width: 80%;"></div>
+                            </div>
+                            <div class="metric-footer">
+                                <span>❌{faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                                <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-header"><span>Instrumentos</span> <span>{disponibilidade}%</span></div>
+                            <div class="metric-bar-bg">
+                                <div class="metric-bar-fill" style="width: 70%;"></div>
+                            </div>
+                            <div class="metric-footer">
+                                <span>❌ {faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                                <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-header"><span>Ferramentas</span> <span>{disponibilidade}%</span></div>
+                            <div class="metric-bar-bg">
+                                <div class="metric-bar-fill" style="width: 70%;"></div>
+                            </div>
+                            <div class="metric-footer">
+                                <span>❌ {faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                                <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-header"><span>Insumos</span> <span>{disponibilidade}%</span></div>
+                            <div class="metric-bar-bg">
+                                <div class="metric-bar-fill" style="width: 70%;"></div>
+                            </div>
+                            <div class="metric-footer">
+                                <span>❌ {faltando}</span> <span>⚠️ {atencao}</span> <span>✅ {normal}</span>
+                                <span style="margin-left: auto;">{faltando}+{atencao}/{normal}</span>
+                            </div>
+                        </div>
+
+                        <div class="tarefas-section">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:bold; font-size:14pt;">Tarefas</span>
+                                <span class="add-btn">+</span>
+                            </div>
+
+                            <div class="tarefa-card">
+                                <span style="font-size:9pt;">{descritivo}</span>
+                                <span class="tarefa-status" style="background:var(--status-red)">{status}</span>
+                            </div>
+                            <div class="tarefa-card">
+                                <span style="font-size:9pt;">{descritivo}</span>
+                                <span class="tarefa-status" style="background:var(--status-blue)">{status}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="painel-view" id="view-apps">
+                <iframe src="BdArborizacao3.html"
+                    style="width: 100%; height: 100%; border: none; background: transparent;"></iframe>
+            </div>
+            <div class="painel-view" id="view-settings">
+                <iframe src="BdEquipamentos7.html"
+                    style="width: 100%; height: 100%; border: none; background: transparent;"></iframe>
+            </div>
+
+            <div class="painel-view" id="view-user">
+                <iframe src="calendario.html"
+                    style="width: 100%; height: 100%; border: none; background: transparent;"></iframe>
+            </div>
+        </div>
+        <nav class="external-nav">
+            <div class="circulo-nav ativo">
+                <i class="fi fi-rr-stats"></i>
+            </div>
+            <div class="circulo-nav">
+                <i class="fi fi-rr-apps"></i>
+            </div>
+            <div class="circulo-nav">
+                <i class="fi fi-rr-settings"></i>
+            </div>
+            <div class="circulo-nav">
+                <i class="fi fi-rr-user"></i>
+            </div>
+        </nav>
+    </div>
+    <div id="vtr-modal-overlay" class="modal-overlay">
+        <div class="vtr-modal broad">
+            <div class="vtr-modal-header">
+                <h2>Gerenciamento de Frota</h2>
+                <button id="close-vtr-modal" class="close-btn">&times;</button>
+            </div>
+
+            <div class="vtr-modal-body">
+                <div class="modal-col-left">
+                    <h3 style="font-size:11pt; color:var(--text-main); margin-bottom:15px; font-weight:600;">Cadastrar
+                        Novo Veículo</h3>
+                    <form id="form-add-vtr">
+                        <div class="form-group">
+                            <label>Status do Veículo *</label>
+                            <select id="vtr-status-input" required
+                                style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 10pt; color: var(--text-main); outline: none; background: #ffffff;">
+                                <option value="Normal">Normal</option>
+                                <option value="Em Manutenção">Em Manutenção</option>
+                                <option value="Avariado">Avariado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fabricante *</label>
+                            <input type="text" id="vtr-fabricante-input" required placeholder="Digite ou selecione..."
+                                list="fabricantes-sugestoes">
+                        </div>
+                        <div class="form-group">
+                            <label>Placa *</label>
+                            <input type="text" id="vtr-placa-input" required placeholder="Ex: ABC-1234">
+                        </div>
+                        <div class="form-group">
+                            <label>Posicionamento / Sigla</label>
+                            <input type="text" id="vtr-sigla-input" placeholder="Ex: VTR-01">
+                        </div>
+                        <div class="form-group">
+                            <label>Linha de Operação *</label>
+                            <select id="vtr-linha-input" required
+                                style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 10pt; color: var(--text-main); outline: none; background: #ffffff;">
+                                <option value="8">Linha 8</option>
+                                <option value="9">Linha 9</option>
+                            </select>
+                        </div>
+
+                        <div class="vtr-modal-actions">
+                            <button type="button" class="btn-cancelar" id="btn-cancelar-vtr">Cancelar</button>
+                            <button type="submit" class="btn-salvar">Salvar Veículo</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-col-right" style="display: flex; flex-direction: column;">
+                    <h3>Visão Geral da Frota (Todas as Linhas)</h3>
+                    <div id="modal-vtr-list" class="modal-list-container" style="flex: 1;">
+                    </div>
+
+                    <div class="vtr-export-wrapper">
+                        <button id="btn-copiar-dados-frota" class="btn-copiar-frota">
+                            <i class="fi fi-rr-copy"></i> Copiar Texto (Relatório)
+                        </button>
+                        <button id="btn-copiar-tabela-frota" class="btn-copiar-frota btn-table-style">
+                            <i class="fi fi-rr-table"></i> Copiar Tabela (Excel/Sistemas)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <datalist id="fabricantes-sugestoes">
+        <option value="Toyota"></option>
+        <option value="Ford"></option>
+        <option value="Volkswagen"></option>
+        <option value="Chevrolet"></option>
+        <option value="Fiat"></option>
+        <option value="Mitsubishi"></option>
+        <option value="Nissan"></option>
+        <option value="Mercedes-Benz"></option>
+        <option value="Renault"></option>
+    </datalist>
+    </div>
+    </div>
+    <div id="pend-modal-overlay" class="modal-overlay-custom">
+        <div class="modal-box-custom">
+
+            <div class="modal-tabs-container">
+                <button type="button" id="tab-btn-editar" class="modal-tab active">
+                    <i class="fi fi-rr-edit-alt"></i> Tratar / Editar
+                </button>
+                <button type="button" id="tab-btn-adicionar" class="modal-tab">
+                    <i class="fi fi-rr-plus"></i> Registrar Nova
+                </button>
+                <button type="button" id="close-pend-modal" class="modal-close-btn-custom"
+                    style="margin-left: auto; margin-right: 15px;">&times;</button>
+            </div>
+
+            <div id="pane-edit-pend" class="modal-pane active">
+                <form id="form-edit-pend" class="modal-form-custom" style="padding-top: 15px;">
+                    <div class="modal-inputs-grid-custom">
+                        <div class="modal-form-section-title">01. Identificação Operacional</div>
+                        <div class="inline-form-group">
+                            <label>Estação (Sigla)</label>
+                            <input type="text" id="pend-sigla-input" required placeholder="Ex: PRA">
+                        </div>
+                        <div class="inline-form-group">
+                            <label>Nº da Ordem (OS)</label>
+                            <input type="text" id="pend-ordem-input" required placeholder="00000000">
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Status da Pendência</label>
+                            <select id="pend-status-input" required>
+                                <option value="Aberto">Aberto</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Atenção">Atenção</option>
+                                <option value="Crítico">Crítico</option>
+                                <option value="Inoperante">Inoperante</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-form-section-title">02. Escopo Técnico</div>
+                        <div class="inline-form-group">
+                            <label>Tipo de Falha</label>
+                            <input type="text" id="pend-tipo-input" required placeholder="Ex: Corretiva">
+                        </div>
+                        <div class="inline-form-group">
+                            <label>Sistema Afetado</label>
+                            <input type="text" id="pend-sistema-input" required placeholder="Ex: Elétrica">
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Responsável Técnico</label>
+                            <input type="text" id="pend-responsavel-input" required
+                                placeholder="Nome do Técnico / Equipe">
+                        </div>
+
+                        <div class="modal-form-section-title">03. Histórico e Soluções</div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Relato Inicial do Defeito</label>
+                            <textarea id="pend-relato-input" required rows="2"
+                                placeholder="Descreva a falha encontrada..."></textarea>
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Ação Preventiva / Corretiva Aplicada</label>
+                            <textarea id="pend-acao-input" rows="2"
+                                placeholder="O que foi feito para mitigar..."></textarea>
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Descritivo Técnico / Observações Adicionais</label>
+                            <textarea id="pend-desc-input" rows="2" placeholder="Notas técnicas extras..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions-custom">
+                        <button type="button" class="btn-cancelar-inline btn-fechar-modal-generic">Cancelar</button>
+                        <button type="submit" class="btn-salvar-inline"><i class="fi fi-rr-disk"></i> Atualizar
+                            Registro</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pane-add-pend" class="modal-pane">
+                <form id="form-add-pend" class="modal-form-custom" style="padding-top: 15px;">
+                    <div class="modal-inputs-grid-custom">
+                        <div class="modal-form-section-title">01. Identificação Operacional</div>
+                        <div class="inline-form-group">
+                            <label>Estação (Sigla)</label>
+                            <input type="text" id="add-pend-sigla-input" required placeholder="Ex: PRA">
+                        </div>
+                        <div class="inline-form-group">
+                            <label>Nº da Ordem (OS)</label>
+                            <input type="text" id="add-pend-ordem-input" required placeholder="00000000">
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Status Inicial</label>
+                            <select id="add-pend-status-input" required>
+                                <option value="Aberto" selected>Aberto</option>
+                                <option value="Atenção">Atenção</option>
+                                <option value="Crítico">Crítico</option>
+                                <option value="Inoperante">Inoperante</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-form-section-title">02. Escopo Técnico</div>
+                        <div class="inline-form-group">
+                            <label>Tipo de Falha</label>
+                            <input type="text" id="add-pend-tipo-input" required placeholder="Ex: Corretiva">
+                        </div>
+                        <div class="inline-form-group">
+                            <label>Sistema Afetado</label>
+                            <input type="text" id="add-pend-sistema-input" required placeholder="Ex: Elétrica">
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Responsável Técnico</label>
+                            <input type="text" id="add-pend-responsavel-input" required
+                                placeholder="Nome do Técnico / Equipe">
+                        </div>
+
+                        <div class="modal-form-section-title">03. Histórico Inicial</div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Relato Inicial do Defeito</label>
+                            <textarea id="add-pend-relato-input" required rows="2"
+                                placeholder="Descreva detalhadamente a falha encontrada em campo..."></textarea>
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Ação Corretiva Provisória (Opcional)</label>
+                            <textarea id="add-pend-acao-input" rows="2"
+                                placeholder="Caso alguma tratativa imediata tenha sido tomada..."></textarea>
+                        </div>
+                        <div class="inline-form-group field-split-full">
+                            <label>Observações / Notas Extras (Opcional)</label>
+                            <textarea id="add-pend-desc-input" rows="2"
+                                placeholder="Informações adicionais relevantes..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions-custom">
+                        <button type="button" class="btn-cancelar-inline btn-fechar-modal-generic">Cancelar</button>
+                        <button type="submit" class="btn-salvar-inline"
+                            style="background:#10b981; border-color:#10b981;"><i class="fi fi-rr-plus"></i> Cadastrar
+                            Nova OS</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

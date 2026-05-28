@@ -1,0 +1,1582 @@
+:root {
+    --primary-bg: #03D2D3;
+    --sidebar-bg: #02A0A1;
+    --white: #ffffff;
+    --text-main: #333;
+    --text-light: #777;
+    --accent-teal: #03D2D3;
+    --status-yellow: #ffdf00;
+    --status-red: #ff4d4d;
+    --status-blue: #02A0A1;
+    --border-light: #e0e0e0;
+    --linha8-fundo-btn: #929288;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================================================
+   TRANSIÇÃO SUAVE PARA A MUDANÇA DE TEMA (LINHA 8 E 9)
+   ============================================================================ */
+body,
+header,
+.sidebar,
+.card,
+.metric-item,
+.select-gatilho,
+.circle,
+.vtr-card,
+.equip-card,
+.tarefa-card,
+.metric-bar-fill {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+
+body {
+    font-family: "Inter", sans-serif;
+    letter-spacing: 5%;
+    background-color: var(--primary-bg);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    color: white;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-placeholder {
+    font-size: 24pt;
+    font-weight: bold;
+    width: 35px;
+    height: 35px;
+}
+
+.line-circles {
+    display: flex;
+    gap: 10px;
+}
+
+.circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    background-color: var(--linha8-fundo-btn);
+    cursor: pointer;
+}
+
+.circle.active {
+    background: white;
+    color: var(--primary-bg);
+    cursor: pointer;
+}
+
+/* 1. Botão "8" quando NÃO está selecionado (Inativo) */
+.line-circles .circle:nth-child(1) {
+    background-color: #929288 !important;
+    color: #ffffff !important;
+}
+
+/* 2. Botão "9" quando NÃO está selecionado (Inativo) */
+.line-circles .circle:nth-child(2) {
+    background-color: #03D2D3 !important;
+    color: #ffffff !important;
+}
+
+/* 3. Comportamento dinâmico quando QUALQUER um deles for SELECIONADO (Ativo) */
+.line-circles .circle.active {
+    background-color: #ffffff !important;
+    color: var(--primary-bg) !important;
+    /* Texto herda dinamicamente a cor da linha ativa */
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: right;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fi-rr-user {
+    color: #929288;
+    scale: 1.5;
+}
+
+/* MAIN CONTAINER */
+/* ============================================================================
+   CONTROLADOR VISUAL DE JANELAS (VIEWS)
+   ============================================================================ */
+.painel-view {
+    display: none;
+    /* Oculta todas por padrão */
+    width: 100%;
+    height: 100%;
+}
+
+.painel-view.active {
+    display: flex;
+
+}
+
+
+.leiaute {
+    display: flex
+}
+
+.janela-stats {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 300px 19.1vw;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    min-height: 92vh;
+}
+
+.main-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 300px 19.1vw;
+    margin: 0 15px 15px 15px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    min-height: 92vh;
+}
+
+/* COLUNA 1: BASE */
+.col-base {
+    padding: 25px;
+    border-right: 1px solid var(--border-light);
+    width: auto;
+}
+
+.section-title {
+    color: var(--accent-teal);
+    font-size: 18pt;
+    margin-bottom: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+
+}
+
+/* Container que segura o select e a seta */
+.select-customizado {
+    position: relative;
+    width: 250px;
+    /* Defina uma largura para o campo não esticar infinito */
+    font-family: sans-serif;
+    user-select: none;
+    /* Evita que o usuário selecione o texto sem querer ao clicar */
+}
+
+/* O gatilho que imita o visual do seu antigo select */
+.select-gatilho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 40px 8px 15px;
+    font-size: 16px;
+    color: var(--accent-teal);
+    background-color: #fff;
+    border: 1px solid var(--accent-teal);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    font-weight: 300;
+}
+
+/* A sua setinha personalizada */
+.select-customizado .seta-icone {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--accent-teal);
+    transition: transform 0.3s ease;
+    /* Animação para girar a seta */
+}
+
+/* --- AQUI COMEÇA A CUSTOMIZAÇÃO DA LISTA --- */
+
+.select-opcoes {
+    position: absolute;
+    top: 110%;
+    /* Fica logo abaixo do gatilho */
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid var(--accent-teal);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+
+    /* Escondido por padrão com opacidade para podermos fazer um efeito de fade-in */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+/* Cada opção individual da lista */
+.select-opcoes .opcao {
+    padding: 10px 15px;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Efeito Hover que você não conseguia fazer no nativo! */
+.select-opcoes .opcao:hover {
+    background-color: var(--accent-teal);
+    color: #fff;
+    /* Texto fica branco quando passa o mouse */
+}
+
+/* --- CLASSES DE ESTADO (Ativadas via JavaScript) --- */
+
+/* Quando o select estiver aberto */
+.select-customizado.aberto .select-opcoes {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Gira a setinha para cima quando o menu abrir */
+.select-customizado.aberto .seta-icone {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.vtr-carrousel {
+    display: flex !important;
+    align-items: stretch !important;
+    /* Força TODOS os filhos a terem exatamente a mesma altura base */
+}
+
+/* ============================================================================
+   BOTÃO DE ADICIONAR VEÍCULO (VERSÃO CORRIGIDA E ALINHADA)
+   ============================================================================ */
+.vtr-add-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 75px;
+    background: var(--white);
+    border: 2px dashed var(--border-light);
+    border-radius: 15px;
+    /* 1. Casado perfeitamente com os 15px do seu vtr-card */
+    cursor: pointer;
+    font-size: 16pt;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    /* Impede que o botão seja esmagado */
+
+    /* 🌟 2. O SEGREDO DO ALINHAMENTO PERFEITO: */
+    /* Copiamos as margens exatas do seu card para trancar as alturas */
+    margin-bottom: 30px !important;
+    margin-right: 8px !important;
+}
+
+/* Efeito visual moderno ao passar o rato (Hover) */
+.vtr-add-card:hover {
+    border-color: var(--primary-bg);
+    color: var(--primary-bg);
+    background: rgba(3, 210, 211, 0.05);
+    transform: scale(1.02);
+}
+
+.vtr-card {
+    border: 1.5px solid #d1f2f3;
+    border-radius: 15px;
+    padding: 15px;
+    width: 280px;
+    margin-bottom: 30px;
+    margin-right: 8px;
+}
+
+.vtr-header {
+    display: flex;
+    justify-content: space-between;
+    color: var(--accent-teal);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.vtr-details {
+    font-size: 9pt;
+    color: #555;
+    line-height: 1.4;
+}
+
+.vtr-details b {
+    color: var(--accent-teal);
+}
+
+
+/* HEADER */
+.pendencia-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+/* LISTA */
+
+.list {
+    width: 100%;
+}
+
+.card {
+    width: 100%;
+    border: 1px solid #d7d7d7;
+    padding: 8px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.left {
+    display: flex;
+    gap: 34px;
+    flex: 1;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.column h3 {
+    font-size: 15px;
+    color: #222;
+    margin-bottom: 2px;
+}
+
+.column small {
+    color: #9b9b9b;
+    font-size: 12px;
+}
+
+.column p {
+    width: 310px;
+    color: #8f8f8f;
+    font-size: 13px;
+    line-height: 1.15rem;
+}
+
+/* TAGS */
+
+.tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.tag {
+    background: var(--primary-bg);
+    color: white;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+.created {
+    margin-top: 10px;
+    color: #b0b0b0;
+    font-size: 12px;
+}
+
+/* RIGHT */
+
+.right {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 90px;
+}
+
+.status {
+    background: #f3d318;
+    color: #000;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 16px;
+    border-radius: 20px;
+}
+
+.update {
+    text-align: right;
+    color: #8f8f8f;
+    font-size: 12px;
+    line-height: 1.2rem;
+}
+
+.edit {
+    font-size: 13px;
+    margin-left: 5px;
+}
+
+/* COLUNA 2: EQUIPAMENTOS */
+.col-equip {
+    padding: 20px;
+    border-right: 1px solid var(--border-light);
+    min-width: 300px;
+}
+
+.equip-title {
+    text-align: center;
+    color: var(--accent-teal);
+    font-size: 13pt;
+    margin-bottom: 15px;
+}
+
+.sigla-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    overflow-x: auto;
+}
+
+.sigla-tag {
+    background: #d1f2f3;
+    color: var(--accent-teal);
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.equip-card {
+    border: 1px solid #eee;
+    border-left: 5px solid var(--accent-teal);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.equip-card.red {
+    border-left-color: var(--status-red);
+}
+
+/* COLUNA 3: DASHBOARD METRICS */
+.col-dash {
+    background: var(--sidebar-bg);
+    color: white;
+    padding: 20px;
+}
+
+.metric-item {
+    margin-bottom: 20px;
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.metric-bar-bg {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    margin: 8px 0;
+}
+
+.metric-bar-fill {
+    height: 100%;
+    background: white;
+    border-radius: 3px;
+}
+
+.metric-footer {
+    display: flex;
+    gap: 10px;
+    font-size: 8pt;
+}
+
+.add-btn {
+    background: white;
+    color: var(--sidebar-bg);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14pt;
+    line-height: 18px;
+    cursor: pointer;
+}
+
+.tarefas-section {
+    margin-top: 40px;
+}
+
+.tarefa-card {
+    background: white;
+    color: var(--text-main);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tarefa-status {
+    padding: 3px 8px;
+    border-radius: 5px;
+    color: white;
+    font-size: 7.5pt;
+    font-weight: bold;
+}
+
+/* NAVEGAÇÃO FLUTUANTE EXTERNA */
+.external-nav {
+    width: 45px;
+    height: 240px;
+    background: #ffffff;
+    border-radius: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    margin-right: 30px;
+}
+
+.circulo-nav {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--primary-bg);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0%;
+}
+
+
+.circulo-nav.ativo {
+    background: var(--primary-bg);
+    border: 3px solid #ffffff;
+    outline: 3px solid var(--primary-bg);
+}
+
+.circulo-nav>i {
+    scale: 0.9;
+    color: var(--primary-bg);
+}
+
+.circulo-nav.ativo>i {
+    color: white;
+}
+
+.col-icons {
+    display: none !important;
+}
+
+/* ============================================================================
+   ESTILOS DO MODAL AMPLIADO (DUAS COLUNAS - CRUD COMPLETO)
+   ============================================================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+}
+
+.modal-overlay.aberto {
+    display: flex;
+}
+
+/* Modal alargado para acomodar o formulário e a lista lado a lado */
+.vtr-modal.broad {
+    background: var(--white);
+    width: 90%;
+    max-width: 950px;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    animation: entradaModal 0.3s ease-out;
+}
+
+.vtr-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    /* Divisão equilibrada entre form e lista */
+    gap: 30px;
+    align-items: start;
+}
+
+.modal-col-right {
+    border-left: 1px solid var(--border-light);
+    padding-left: 25px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-col-right h3 {
+    font-size: 11pt;
+    color: var(--text-main);
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.modal-list-container {
+    overflow-y: auto;
+    max-height: 380px;
+    /* Evita que o modal estique infinitamente para baixo */
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Mini-cards internos da lista geral */
+.modal-vtr-item {
+    background: #f8fafc;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-vtr-info {
+    font-size: 9.5pt;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.modal-vtr-info strong {
+    color: var(--primary-bg);
+}
+
+.modal-vtr-actions {
+    display: flex;
+    gap: 6px;
+}
+
+/* Botões de Ação rápidos (Editar e Excluir) */
+.modal-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-action-btn:hover {
+    background: #e2e8f0;
+    color: var(--text-main);
+}
+
+.modal-action-btn.del:hover {
+    color: var(--status-red);
+    background: #fef2f2;
+}
+
+/* Demais estilos padrão do cabeçalho e formulário */
+@keyframes entradaModal {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.vtr-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 12px;
+}
+
+.vtr-modal-header h2 {
+    font-size: 14pt;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 22pt;
+    cursor: pointer;
+    color: var(--text-light);
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: var(--status-red);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 9.5pt;
+    color: var(--text-light);
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 10pt;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-bg);
+}
+
+.vtr-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.vtr-modal-actions button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 10pt;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.btn-cancelar {
+    background: #f0f0f0;
+    color: var(--text-light);
+}
+
+.btn-cancelar:hover {
+    background: #e5e5e5;
+}
+
+.btn-salvar {
+    background: var(--primary-bg);
+    color: var(--white);
+}
+
+.btn-salvar:hover {
+    opacity: 0.9;
+}
+
+/* ============================================================================
+   ESTILOS PARA EDIÇÃO EM TEMPO REAL DENTRO DO CARD (IN-LINE CRUD)
+   ============================================================================ */
+.vtr-mode-view,
+.vtr-mode-edit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+}
+
+/* Organiza os mini-inputs dentro do card em duas colunas organizadas */
+.modal-vtr-inputs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Mantém duas colunas organizadas */
+    gap: 10px;
+    flex: 1;
+}
+
+/* Estilização dos campos internos de edição rápida */
+.inline-edit-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    font-size: 8.5pt;
+    color: var(--text-main);
+    outline: none;
+    background: #ffffff;
+    transition: border-color 0.2s;
+}
+
+.inline-edit-input:focus {
+    border-color: var(--primary-bg);
+    box-shadow: 0 0 0 2px rgba(3, 210, 211, 0.1);
+}
+
+/* Destaca o botão de confirmação com uma cor de sucesso */
+.modal-action-btn.save:hover {
+    color: #10b981;
+    background: #f0fdf4;
+}
+
+/* Estilo para o botão de fechar/cancelar edição */
+.modal-action-btn.cancel:hover {
+    color: var(--status-red);
+    background: #fef2f2;
+}
+
+/* Container de cada campo + label dentro do card */
+.inline-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Distância sutil entre a label e o input */
+}
+
+/* Micro-label elegante que nunca some ao digitar */
+.inline-form-group label {
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase; /* Deixa em caixa alta para dar cara de painel técnico */
+    letter-spacing: 0.5px;
+}
+
+/* Alinha verticalmente os botões de ação para casar com a nova altura das labels */
+.vtr-mode-edit {
+    align-items: flex-end !important; 
+    padding-bottom: 2px;
+}
+
+/* ============================================================================
+   ESTILIZAÇÃO DOS DROPDOWNS INTERNOS DE EDIÇÃO (SELECTS)
+   ============================================================================ */
+select.inline-edit-input {
+    background-color: #ffffff;
+    cursor: pointer;
+    padding: 5px 8px; /* Altura ideal casada com os inputs normais */
+}
+
+select.inline-edit-input:focus {
+    border-color: var(--primary-bg);
+}
+
+/* ============================================================================
+   INTERAÇÃO DE HOVER NOS CARDS DE VEÍCULO (IGUAL AO BOTÃO ADICIONAR)
+   ============================================================================ */
+.vtr-card {
+    /* 💡 Forçamos uma transição dedicada para incluir o 'transform' (efeito de crescimento)
+       de forma extremamente suave, junto com a borda e a sombra */
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease !important;
+}
+
+/* Aplica exatamente a mesma animação do botão de "+" ao passar o mouse */
+.vtr-card:hover {
+    border-color: var(--primary-bg) !important;
+    transform: scale(1.02);                         /* Efeito de aproximação suave */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);    /* Elevação visual sutil (sombra) */
+    background-color: rgba(3, 210, 211, 0.02) !important; /* Leve tom esverdeado/teal no fundo */
+}
+
+/* ============================================================================
+   BOTÃO DE EXPORTAÇÃO/CÓPIA DE TEXTO DA FROTA
+   ============================================================================ */
+.btn-copiar-frota {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #334155;
+    font-size: 9.5pt;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-copiar-frota:hover {
+    background: var(--primary-bg);
+    color: #ffffff;
+    border-color: var(--primary-bg);
+}
+
+.btn-copiar-frota i {
+    font-size: 11pt;
+}
+
+/* ============================================================================
+   GRID RESPONSIVO PARA OS BOTÕES DE CÓPIA DO RELATÓRIO
+   ============================================================================ */
+.vtr-export-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.btn-copiar-frota {
+    flex: 1; /* Faz os dois botões dividirem o espaço igualmente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 8px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #334155;
+    font-size: 9pt;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+/* Estilo diferenciado para o botão de tabela técnica */
+.btn-copiar-frota.btn-table-style {
+    background: #e2e8f0;
+}
+
+.btn-copiar-frota:hover {
+    background: var(--primary-bg);
+    color: #ffffff;
+    border-color: var(--primary-bg);
+}
+
+/* Ajuste sutil para celulares (empilha se a tela for muito estreita) */
+@media (max-width: 480px) {
+    .vtr-export-wrapper {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+/* ============================================================================
+   MENU DE CONTEXTO CUSTOMIZADO PARA ALTERAÇÃO DE STATUS (EQUIPAMENTOS)
+   ============================================================================ */
+.custom-context-menu {
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    padding: 6px 0;
+    z-index: 100000;
+    min-width: 150px;
+    animation: abrirMenuSuave 0.12s ease-out;
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    font-size: 9.5pt;
+    color: var(--text-main);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.context-menu-item:hover {
+    background: #f1f5f9;
+}
+
+@keyframes abrirMenuSuave {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================================
+   INTERAÇÃO DE HOVER NOS CARDS DE EQUIPAMENTO (IGUAL AO CARD VTR)
+   ============================================================================ */
+.equip-card {
+    /* Forçamos a transição dedicada para incluir o 'transform' de forma suave,
+       evitando quebras ou saltos bruscos na animação */
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease !important;
+}
+
+/* Aplica o efeito de crescimento e elevação ao passar o mouse */
+.equip-card:hover {
+    border-color: var(--primary-bg) !important;
+    transform: scale(1.02);                         /* Efeito de aproximação sutil (2%) */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);    /* Cria uma sombra de elevação premium */
+    background-color: rgba(3, 210, 211, 0.02) !important; /* Leve brilho teal de fundo */
+}
+
+/* 💡 AJUSTE INTELIGENTE: Se o equipamento estiver Inoperante (.red), preservamos 
+   a identidade de alerta visual de erro mesmo durante a flutuação do mouse */
+.equip-card.red:hover {
+    border-color: #ff4d4d !important;               /* Mantém a borda vermelha de alerta */
+    background-color: #fff5f5 !important;           /* Altera para um fundo avermelhado sutil */
+}
+
+/* ============================================================================
+   BOTÕES DE FILTRO DE STATUS DE EQUIPAMENTOS (PILLS)
+   ============================================================================ */
+.equip-filters-row {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+    padding: 0 2px;
+    width: 100%;
+}
+
+.btn-filter-equip {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 8.5pt;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-filter-equip:hover {
+    background: #e2e8f0;
+}
+
+/* Quando o filtro estiver ativo, ele assume a cor de identidade da linha corrente */
+.btn-filter-equip.active {
+    background: var(--primary-bg);
+    color: #ffffff;
+    border-color: var(--primary-bg);
+}
+
+/* ============================================================================
+   INTERAÇÃO DE SELEÇÃO MULTI-TAGS DE ESTAÇÃO (EQUIPAMENTOS)
+   ============================================================================ */
+.sigla-tag {
+    cursor: pointer !important;
+    user-select: none; /* Impede que o texto fique azul ao clicar repetidamente no celular */
+    transition: all 0.25s ease !important;
+}
+
+/* Estado ativo quando a tag de estação estiver selecionada no filtro */
+.sigla-tag.active {
+    background: var(--primary-bg) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-bg) !important;
+    box-shadow: 0 4px 12px rgba(3, 210, 211, 0.15);
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   INTERAÇÃO DE HOVER NOS CARDS DE PENDÊNCIAS (IGUAL AO CARD VTR)
+   ============================================================================ */
+.list .card {
+    /* Força uma transição dedicada e fluida para evitar saltos ou travamentos 
+       durante a animação de aproximação e elevação */
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease !important;
+    cursor: pointer; /* Transforma o cursor do mouse em mãozinha clicável */
+}
+
+/* Efeito ativado quando o operador passa o mouse sobre a linha/card de pendência */
+.list .card:hover {
+    border-color: var(--primary-bg) !important;       /* Borda assume a cor ativa da linha (8 ou 9) */
+    transform: scale(1.015);                           /* Efeito de aproximação sutil (adequado para cards horizontais de lista) */
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);        /* Sombra suave simulando que o card flutuou sobre a tabela */
+    background-color: rgba(3, 210, 211, 0.01) !important; /* Leve tom iluminado ao fundo combinando com o tema */
+}
+
+/* ============================================================================
+   JANELA MODAL DEDICADA PARA TRATAMENTO DE PENDÊNCIAS
+   ============================================================================ */
+.modal-overlay-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: none; /* Controlado via JavaScript */
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+.modal-overlay-custom.aberto {
+    display: flex;
+}
+
+.modal-box-custom {
+    background: #ffffff;
+    width: 90%;
+    max-width: 620px;
+    border-radius: 14px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    animation: abrirModalSuave 0.22s ease-out;
+}
+
+.modal-header-custom {
+    background: #f8fafc;
+    padding: 16px 22px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header-custom h2 {
+    font-size: 12.5pt;
+    color: #1e293b;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-close-btn-custom {
+    background: none;
+    border: none;
+    font-size: 22pt;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal-close-btn-custom:hover {
+    color: #ef4444;
+}
+
+.modal-form-custom {
+    padding: 22px;
+}
+
+.modal-inputs-grid-custom {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.modal-actions-custom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.btn-cancelar-inline {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 9pt;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancelar-inline:hover { background: #e2e8f0; }
+
+.btn-salvar-inline {
+    background: var(--primary-bg);
+    border: 1px solid var(--primary-bg);
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 9pt;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-salvar-inline:hover { opacity: 0.9; }
+
+@keyframes abrirModalSuave {
+    from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 580px) {
+    .modal-inputs-grid-custom { grid-template-columns: 1fr; }
+    .modal-inputs-grid-custom div { grid-column: span 1 !important; }
+}
+
+/* ============================================================================
+   OVERHAUL DESIGN: MODAL DE PENDÊNCIAS PREMIUM (MOBILE-OPTIMIZED)
+   ============================================================================ */
+.modal-overlay-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.45); /* Tom slate escuro elegante */
+    backdrop-filter: blur(6px);          /* Desfoque de fundo mais imersivo */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    padding: 15px;
+}
+
+.modal-overlay-custom.aberto {
+    display: flex;
+}
+
+.modal-box-custom {
+    background: #ffffff;
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh; /* Impede que o modal estoure a tela em celulares */
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow-y: auto; /* Ativa scroll interno caso a tela seja pequena */
+    border: 1px solid #e2e8f0;
+}
+
+/* Oculta barra de scroll nativa do modal para manter visual limpo */
+.modal-box-custom::-webkit-scrollbar {
+    width: 4px;
+}
+.modal-box-custom::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.modal-header-custom {
+    background: #f8fafc;
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modal-header-custom h2 {
+    font-size: 11.5pt;
+    color: #0f172a;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header-custom h2 i {
+    color: var(--primary-bg);
+    font-size: 13pt;
+}
+
+.modal-close-btn-custom {
+    background: #e2e8f0;
+    border: none;
+    font-size: 16pt;
+    color: #475569;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn-custom:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.modal-form-custom {
+    padding: 24px;
+}
+
+.modal-inputs-grid-custom {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* Divisores de Seção Técnicos */
+.modal-form-section-title {
+    grid-column: span 2;
+    font-size: 7.5pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.8px;
+    margin-top: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.modal-form-section-title:first-child {
+    margin-top: 0;
+}
+
+/* Modificadores de Grid */
+.field-split-full {
+    grid-column: span 2 !important;
+}
+
+/* Estilização Avançada dos Inputs Corporativos */
+.modal-inputs-grid-custom .inline-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.modal-inputs-grid-custom label {
+    font-size: 8.5pt;
+    font-weight: 600;
+    color: #334155;
+}
+
+.modal-inputs-grid-custom input[type="text"],
+.modal-inputs-grid-custom select,
+.modal-inputs-grid-custom textarea {
+    width: 100%;
+    padding: 11px 14px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 9.5pt;
+    color: #1e293b;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-inputs-grid-custom input:hover,
+.modal-inputs-grid-custom select:hover,
+.modal-inputs-grid-custom textarea:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+/* Brilho inteligente focado no tema ativo da linha */
+.modal-inputs-grid-custom input:focus,
+.modal-inputs-grid-custom select:focus,
+.modal-inputs-grid-custom textarea:focus {
+    background: #ffffff;
+    border-color: var(--primary-bg);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(3, 210, 211, 0.12);
+}
+
+.modal-inputs-grid-custom textarea {
+    resize: vertical;
+    min-height: 55px;
+}
+
+/* Container de Botões Inferiores */
+.modal-actions-custom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-cancelar-inline {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 9pt;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-cancelar-inline:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-salvar-inline {
+    background: var(--primary-bg);
+    border: 1px solid var(--primary-bg);
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 9pt;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+.btn-salvar-inline:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+/* 📱 AJUSTES RESPONSIVOS DE ALTA CALIBRAÇÃO PARA SMARTPHONES */
+@media (max-width: 540px) {
+    .modal-box-custom {
+        max-height: 95vh;
+    }
+    .modal-form-custom {
+        padding: 16px;
+    }
+    .modal-inputs-grid-custom {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .modal-inputs-grid-custom div {
+        grid-column: span 1 !important;
+    }
+    .modal-actions-custom {
+        flex-direction: column-reverse; /* Empilha botões no celular colocando Salvar no topo */
+        gap: 8px;
+    }
+    .modal-actions-custom button {
+        width: 100%;
+        justify-content: center;
+        padding: 14px; /* Touch target ampliado para o dedo */
+    }
+}
+
+/* ============================================================================
+   SISTEMA DE ABAS DO MODAL CORPORATIVO (TABS DESIGN)
+   ============================================================================ */
+.modal-tabs-container {
+    display: flex;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    align-items: center;
+    width: 100%;
+}
+
+.modal-tab {
+    background: none;
+    border: none;
+    padding: 16px 20px;
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.modal-tab:hover {
+    color: #1e293b;
+    background: #f1f5f9;
+}
+
+/* Estado ativo da aba assume dinamicamente a cor da identidade da linha */
+.modal-tab.active {
+    color: var(--primary-bg);
+    border-bottom-color: var(--primary-bg);
+    background: #ffffff;
+}
+
+/* Gerenciador de visibilidade dos painéis */
+.modal-pane {
+    display: none;
+}
+
+.modal-pane.active {
+    display: block;
+}
+
+/* Ajuste responsivo para celulares estreitos */
+@media (max-width: 480px) {
+    .modal-tabs-container {
+        flex-wrap: wrap;
+    }
+    .modal-tab {
+        padding: 14px 12px;
+        font-size: 8.5pt;
+        flex: 1;
+        justify-content: center;
+    }
+    .modal-close-btn-custom {
+        width: 100%;
+        border-radius: 0;
+        border-top: 1px solid #e2e8f0;
+        padding: 6px 0;
+        height: auto;
+        order: 10; /* Empurra o 'X' para baixo das abas no mobile */
+    }
+}

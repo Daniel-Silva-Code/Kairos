@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Operacional - Status</title>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Como este arquivo roda dentro de uma iframe, resetamos o body para preencher o espaço sem margens duplas */
+        body {
+            background: transparent !important;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            font-family: "Inter", sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="dashboard-kpi-row">
+        <div class="metric-item">
+            <div class="metric-header"><span>EPC</span><small class="disponibilidade">{disponibilidade}</small></div>
+            <div class="metric-bar"><div class="metric-bar-fill" style="width: 0%;"></div></div>
+            <div class="metric-counters">
+                <span class="status-count normal">🟢 {normal}</span>
+                <span class="status-count atencao">🟡 {atencao}</span>
+                <span class="status-count faltando">🔴 {faltando}</span>
+            </div>
+        </div>
+        <div class="metric-item">
+            <div class="metric-header"><span>Instrumentos</span><small class="disponibilidade">{disponibilidade}</small></div>
+            <div class="metric-bar"><div class="metric-bar-fill" style="width: 0%;"></div></div>
+            <div class="metric-counters">
+                <span class="status-count normal">🟢 {normal}</span>
+                <span class="status-count atencao">🟡 {atencao}</span>
+                <span class="status-count faltando">🔴 {faltando}</span>
+            </div>
+        </div>
+        <div class="metric-item">
+            <div class="metric-header"><span>Ferramentas</span><small class="disponibilidade">{disponibilidade}</small></div>
+            <div class="metric-bar"><div class="metric-bar-fill" style="width: 0%;"></div></div>
+            <div class="metric-counters">
+                <span class="status-count normal">🟢 {normal}</span>
+                <span class="status-count atencao">🟡 {atencao}</span>
+                <span class="status-count faltando">🔴 {faltando}</span>
+            </div>
+        </div>
+        <div class="metric-item">
+            <div class="metric-header"><span>Insumos</span><small class="disponibilidade">{disponibilidade}</small></div>
+            <div class="metric-bar"><div class="metric-bar-fill" style="width: 0%;"></div></div>
+            <div class="metric-counters">
+                <span class="status-count normal">🟢 {normal}</span>
+                <span class="status-count atencao">🟡 {atencao}</span>
+                <span class="status-count faltando">🔴 {faltando}</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="dashboard-body-layout">
+        
+        <main class="dashboard-main-content">
+            
+            <div class="select-customizado">
+                <div class="select-gatilho"><span>Selecionar Base</span><i class="fi-rr-angle-small-down"></i></div>
+                <div class="select-opcoes"></div>
+            </div>
+
+            <article class="dashboard-widget">
+                <div class="widget-header"><h3>Status da Frota</h3></div>
+                <div class="widget-content json-container">
+                    <div class="vtr-card">
+                        <div class="vtr-status">{status}</div>
+                        <div class="vtr-info">
+                            <strong>{fabricante}</strong> - Placa: {placa}<br>
+                            <small>Combustível: {ncombust} | Diário: {diariobordo} | Cartão: {cartaoabast} | Sigla: {sigla}</small>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dashboard-widget">
+                <div class="widget-header"><h3>Lista de Pendências KPI</h3></div>
+                <div class="widget-content list">
+                    <div>
+                        <strong>[{sigla}] {sistema}</strong> - Ordem: {ordem}<br>
+                        <p>{descritivo} - Relato: {relato} -> Ação: {acao}</p>
+                        <small>Status: {status} | Resp: {responsavel} | Criado: {data-criacao} | Modif: {modificacao}</small>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dashboard-widget">
+                <div class="widget-header"><h3>Status dos Equipamentos</h3></div>
+                <div class="widget-content" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div class="equip-card">
+                        <strong>{sigla}</strong><br>
+                        <small>{equipamento} ({Sistema})</small><br>
+                        <span class="status">{Status}</span>
+                    </div>
+                </div>
+            </article>
+        </main>
+
+        <aside class="dashboard-sidebar-content">
+            <article class="dashboard-widget tarefas-section" style="margin-top: 0;">
+                <div class="widget-header"><h3>Tarefas</h3></div>
+                <div class="widget-content">
+                    <div class="tarefa-card">
+                        <span>{descritivo}</span>
+                        <span class="tarefa-status">{status}</span>
+                    </div>
+                </div>
+            </article>
+        </aside>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Função de comunicação: Quando o arquivo pai (teste.html) mudar a linha (8 ou 9), ele avisa esta função para filtrar o Appwrite
+        window.receberNovaLinha = function(linha) {
+            linhaAtiva = linha;
+            mudarTemaLinha(linha);
+            recarregarDadosPainel();
+        }
+    </script>
+</body>
+</html>

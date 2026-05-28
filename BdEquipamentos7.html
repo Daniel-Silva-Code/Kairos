@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGO - Engenharia Drag & Drop Pro</title>
+    <style>
+        :root {
+            --primary: #2563eb; --secondary: #64748b; --bg: #f1f5f9; --text: #1e293b; --white: #ffffff;
+            --border: #e2e8f0; --success: #10b981; --danger: #ef4444;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100vh; overflow: hidden; }
+        
+        .main-wrapper { display: flex; height: 100vh; }
+        .col-left { flex: 1; padding: 20px; overflow-y: auto; border-right: 2px solid var(--border); }
+        .col-right { width: 380px; background: var(--white); padding: 20px; overflow-y: auto; box-shadow: -4px 0 10px rgba(0,0,0,0.05); }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .folder { background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+        summary { padding: 15px; cursor: pointer; font-weight: bold; display: flex; align-items: center; background: #fff; list-style: none; }
+        summary::before { content: "📁 "; margin-right: 10px; }
+        
+        .modelo-box { 
+            margin: 10px 10px 10px 30px; 
+            border-left: 4px solid var(--primary); 
+            padding: 15px; 
+            background: #fafafa; 
+            border-radius: 0 8px 8px 0; 
+            transition: all 0.2s;
+        }
+        .modelo-box.drag-over { 
+            background: #dbeafe; 
+            border-left-color: var(--success); 
+            transform: scale(1.01);
+        }
+        
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.8rem; margin-top: 10px; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+        
+        .cat-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; font-weight: bold; background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; }
+        .sap-badge { font-family: monospace; background: #334155; color: white; padding: 2px 5px; border-radius: 4px; font-size: 0.7rem; }
+        
+        .side-item { 
+            padding: 12px; 
+            border-bottom: 1px solid #f1f5f9; 
+            font-size: 0.85rem; 
+            cursor: grab; 
+            background: white;
+            transition: background 0.2s;
+        }
+        .side-item:active { cursor: grabbing; }
+        .side-item:hover { background: #f8fafc; border-left: 3px solid var(--primary); }
+        .side-item b { color: var(--primary); font-size: 0.9rem; }
+        .side-item span { font-size: 0.75rem; color: var(--secondary); display: block; margin-top: 4px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 600px; max-height: 85vh; overflow-y: auto; }
+        input { width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        
+        .comp-row { display: flex; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; align-items: center; border: 1px solid #e2e8f0; }
+        .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-add { background: var(--primary); color: white; }
+
+        .filter-group { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .filter-group label { font-size: 0.75rem; font-weight: bold; color: var(--secondary); margin-top: 5px; display: block; }
+        
+        .side-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .btn-side { font-size: 0.75rem; padding: 8px; }
+        .btn-copy { background: var(--secondary); color: white; }
+        .btn-clear { background: #e2e8f0; color: var(--text); }
+        .btn-new-comp { background: var(--success); color: white; grid-column: span 2; margin-bottom: 5px; }
+        .btn-danger-side { background: var(--danger); color: white; grid-column: span 2; font-size: 0.7rem; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="col-left">
+            <div class="header">
+                <h1>🛠️ Engenharia de Modelos</h1>
+                <button class="btn btn-add" onclick="abrirModal()">+ Novo Modelo</button>
+            </div>
+            <div id="lista">Carregando catálogo...</div>
+        </div>
+
+        <div class="col-right">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>🔍 Peças</h3>
+                <button class="btn btn-side btn-new-comp" onclick="abrirModalComponente()">+ Novo Componente</button>
+            </div>
+            
+            <div class="filter-group">
+                <label>Nome:</label><input type="text" id="f-nome" onkeyup="filtrarLateral()">
+                <label>Função:</label><input type="text" id="f-funcao" onkeyup="filtrarLateral()">
+                <label>SAP:</label><input type="text" id="f-sap" onkeyup="filtrarLateral()">
+            </div>
+
+            <div class="side-actions">
+                <button class="btn btn-side btn-copy" onclick="copiarSapsVisiveis()">📋 Copiar SAPs</button>
+                <button class="btn btn-side btn-clear" onclick="limparFiltros()">🧹 Limpar</button>
+                <button class="btn btn-side btn-danger-side" onclick="apagarTodasAvulsas()">🗑️ Remover peça sem uso</button>
+            </div>
+
+            <div id="lista-global-componentes"></div>
+        </div>
+    </div>
+
+    <!-- Modal Novo Componente Avulso -->
+    <div id="modal-comp" class="modal">
+        <div class="modal-content" style="width: 400px;">
+            <h3>Cadastrar Novo Componente</h3>
+            <label>Nome da Peça:</label><input type="text" id="nc-nome">
+            <label>Código SAP:</label><input type="text" id="nc-sap">
+            <label>Função/Tipo:</label><input type="text" id="nc-funcao" list="sugestoes-funcao">
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-add" style="flex:2" onclick="salvarComponenteAvulso()">Salvar</button>
+                <button class="btn" style="flex:1; background:#ccc" onclick="fecharModalComp()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <datalist id="sugestoes-funcao">
+        <option value="Fixação"><option value="Organização"><option value="Eletrônico"><option value="Mecânico"><option value="Consumível">
+    </datalist>
+
+    <!-- Modal Ficha Técnica -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-titulo">Ficha Técnica</h3>
+            <form id="form">
+                <input type="hidden" id="id">
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:2"><label>Equipamento:</label><input type="text" id="equipamento" required></div>
+                    <div style="flex:1"><label>SAP Principal:</label><input type="text" id="sap"></div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>Fabricante:</label><input type="text" id="fabricante" required></div>
+                    <div style="flex:1"><label>Modelo:</label><input type="text" id="modelo" required></div>
+                </div>
+                <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+                <div id="lista-inputs"></div>
+                <button type="button" class="btn" style="background:#f1f5f9; width:100%; border:1px dashed #ccc;" onclick="addLinha()">+ Adicionar Peça</button>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="submit" class="btn btn-add" style="flex:2;">Salvar Dados</button>
+                    <button type="button" class="btn" style="flex:1; background:#e2e8f0;" onclick="fecharModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+    <script>
+        const { Client, Databases, ID } = Appwrite;
+        const client = new Client().setEndpoint('https://syd.cloud.appwrite.io/v1').setProject('69e0dbe500145c5ba8c3');
+        const databases = new Databases(client);
+        const DB = "69e0def3001636121611", COL = "limodelos";
+
+        let todosModelos = [];
+        let estadosPastas = {};
+
+        async function carregar() {
+            try {
+                document.querySelectorAll('details.folder').forEach(det => {
+                    const nomePasta = det.querySelector('summary').innerText.trim();
+                    estadosPastas[nomePasta] = det.open;
+                });
+
+                const res = await databases.listDocuments(DB, COL);
+                todosModelos = res.documents;
+                const grupos = todosModelos.reduce((a, b) => {
+                    if (b.equipamento !== "Z - PEÇAS AVULSAS") {
+                        a[b.equipamento] = a[b.equipamento] || [];
+                        a[b.equipamento].push(b);
+                    }
+                    return a;
+                }, {});
+                renderizar(grupos);
+                renderizarLateral();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderizar(grupos) {
+            const container = document.getElementById('lista');
+            container.innerHTML = "";
+            Object.keys(grupos).sort().forEach(eq => {
+                const det = document.createElement('details');
+                det.className = 'folder';
+                if (estadosPastas[eq]) det.open = true;
+                det.innerHTML = `<summary>${eq}</summary>`;
+                grupos[eq].forEach(m => {
+                    const nomes = m.componentes_nomes_raw ? m.componentes_nomes_raw.split('|') : [];
+                    const saps = m.componentes_saps_raw ? m.componentes_saps_raw.split('|') : [];
+                    const cats = m.componentes_categorias_raw ? m.componentes_categorias_raw.split('|') : [];
+                    const box = document.createElement('div');
+                    box.className = 'modelo-box';
+                    box.dataset.id = m.$id;
+                    box.ondragover = (e) => { e.preventDefault(); box.classList.add('drag-over'); };
+                    box.ondragleave = () => { box.classList.remove('drag-over'); };
+                    box.ondrop = (e) => lidarComDrop(e, m.$id);
+                    box.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong>${m.fabricante} ${m.modelo}</strong>
+                            <button class="btn" style="background:#eee; padding:5px 8px;" onclick='prepararEdicao(${JSON.stringify(m)})'>✏️</button>
+                        </div>
+                        <table>
+                            <thead><tr><th>Função</th><th>Peça</th><th>SAP</th></tr></thead>
+                            <tbody>
+                                ${nomes.map((n, i) => `<tr><td><span class="cat-badge">${cats[i]||'Geral'}</span></td><td>${n}</td><td><span class="sap-badge">${saps[i]||''}</span></td></tr>`).join('')}
+                            </tbody>
+                        </table>`;
+                    det.appendChild(box);
+                });
+                container.appendChild(det);
+            });
+        }
+
+        function renderizarLateral() {
+            const container = document.getElementById('lista-global-componentes');
+            container.innerHTML = "";
+            let html = "";
+            let componentesUnicos = new Set();
+            todosModelos.forEach(m => {
+                const nomes = m.componentes_nomes_raw ? m.componentes_nomes_raw.split('|') : [];
+                const saps = m.componentes_saps_raw ? m.componentes_saps_raw.split('|') : [];
+                const cats = m.componentes_categorias_raw ? m.componentes_categorias_raw.split('|') : [];
+                nomes.forEach((nome, i) => {
+                    const nomeLimpo = nome.trim();
+                    if(!nomeLimpo) return;
+                    if (!componentesUnicos.has(nomeLimpo)) {
+                        componentesUnicos.add(nomeLimpo);
+                        const sapVal = saps[i] || '---';
+                        html += `
+                            <div class="side-item" draggable="true" 
+                                 data-nome="${nomeLimpo.toLowerCase()}" 
+                                 data-funcao="${(cats[i]||'geral').toLowerCase()}" 
+                                 data-sap="${sapVal.toLowerCase()}"
+                                 ondragstart="event.dataTransfer.setData('text/plain', '${nomeLimpo}|${saps[i]||''}|${cats[i]||'Geral'}')">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <b>${nomeLimpo}</b>
+                                    <span class="cat-badge" style="font-size: 0.6rem;">${cats[i] || 'Geral'}</span>
+                                </div>
+                                <span>SAP: ${sapVal}</span>
+                            </div>`;
+                    }
+                });
+            });
+            container.innerHTML = html || "<p>Nenhum componente único.</p>";
+        }
+
+        async function salvarComponenteAvulso() {
+            const nome = document.getElementById('nc-nome').value.trim();
+            const sap = document.getElementById('nc-sap').value.trim();
+            const funcao = document.getElementById('nc-funcao').value.trim() || "Geral";
+            if(!nome) return alert("O nome da peça é obrigatório.");
+            let modeloAvulso = todosModelos.find(m => m.equipamento === "Z - PEÇAS AVULSAS");
+            try {
+                if(!modeloAvulso) {
+                    await databases.createDocument(DB, COL, ID.unique(), {
+                        equipamento: "Z - PEÇAS AVULSAS", fabricante: "SGO", modelo: "Banco de Dados Geral",
+                        componentes_nomes_raw: nome, componentes_saps_raw: sap, componentes_categorias_raw: funcao
+                    });
+                } else {
+                    const novosNomes = modeloAvulso.componentes_nomes_raw ? `${modeloAvulso.componentes_nomes_raw}|${nome}` : nome;
+                    const novosSaps = modeloAvulso.componentes_saps_raw ? `${modeloAvulso.componentes_saps_raw}|${sap}` : sap;
+                    const novasCats = modeloAvulso.componentes_categorias_raw ? `${modeloAvulso.componentes_categorias_raw}|${funcao}` : funcao;
+                    await databases.updateDocument(DB, COL, modeloAvulso.$id, {
+                        componentes_nomes_raw: novosNomes, componentes_saps_raw: novosSaps, componentes_categorias_raw: novasCats
+                    });
+                }
+                fecharModalComp(); carregar();
+            } catch (e) { alert("Erro ao salvar componente."); }
+        }
+
+        async function apagarTodasAvulsas() {
+            if (!confirm("Tem certeza que deseja APAGAR PERMANENTEMENTE todas as peças cadastradas no banco de peças avulsas? Esta ação não pode ser desfeita.")) return;
+            
+            let modeloAvulso = todosModelos.find(m => m.equipamento === "Z - PEÇAS AVULSAS");
+            if (!modeloAvulso) return alert("Não existem peças avulsas para apagar.");
+
+            try {
+                await databases.updateDocument(DB, COL, modeloAvulso.$id, {
+                    componentes_nomes_raw: "",
+                    componentes_saps_raw: "",
+                    componentes_categorias_raw: ""
+                });
+                alert("Banco de peças avulsas limpo com sucesso.");
+                carregar();
+            } catch (e) { alert("Erro ao limpar banco: " + e.message); }
+        }
+
+        async function lidarComDrop(e, modeloId) {
+            e.preventDefault();
+            const box = document.querySelector(`.modelo-box[data-id="${modeloId}"]`);
+            box.classList.remove('drag-over');
+            const dadosPeça = e.dataTransfer.getData('text/plain').split('|');
+            const [nome, sap, cat] = dadosPeça;
+            const m = todosModelos.find(item => item.$id === modeloId);
+            const novosNomes = m.componentes_nomes_raw ? `${m.componentes_nomes_raw}|${nome}` : nome;
+            const novosSaps = m.componentes_saps_raw ? `${m.componentes_saps_raw}|${sap}` : sap;
+            const novasCats = m.componentes_categorias_raw ? `${m.componentes_categorias_raw}|${cat}` : cat;
+            try {
+                await databases.updateDocument(DB, COL, modeloId, {
+                    componentes_nomes_raw: novosNomes, componentes_saps_raw: novosSaps, componentes_categorias_raw: novasCats
+                });
+                carregar(); 
+            } catch (err) { alert("Erro ao copiar."); }
+        }
+
+        function filtrarLateral() {
+            const fNome = document.getElementById('f-nome').value.toLowerCase();
+            const fFuncao = document.getElementById('f-funcao').value.toLowerCase();
+            const fSap = document.getElementById('f-sap').value.toLowerCase();
+            const itens = document.querySelectorAll('.side-item');
+            itens.forEach(it => {
+                const matchNome = it.getAttribute('data-nome').includes(fNome);
+                const matchFuncao = it.getAttribute('data-funcao').includes(fFuncao);
+                const matchSap = it.getAttribute('data-sap').includes(fSap);
+                it.style.display = (matchNome && matchFuncao && matchSap) ? "block" : "none";
+            });
+        }
+
+        function limparFiltros() {
+            document.getElementById('f-nome').value = "";
+            document.getElementById('f-funcao').value = "";
+            document.getElementById('f-sap').value = "";
+            filtrarLateral();
+        }
+
+        function copiarSapsVisiveis() {
+            const itens = document.querySelectorAll('.side-item');
+            let sapsParaCopiar = [];
+            itens.forEach(it => {
+                if (window.getComputedStyle(it).display !== 'none') {
+                    let sapRaw = it.getAttribute('data-sap');
+                    if (sapRaw && sapRaw !== '---') sapsParaCopiar.push(sapRaw.toUpperCase());
+                }
+            });
+            if (sapsParaCopiar.length > 0) {
+                navigator.clipboard.writeText(sapsParaCopiar.join('\n')).then(() => alert(`${sapsParaCopiar.length} SAPs copiados!`));
+            } else alert('Nada para copiar.');
+        }
+
+        function abrirModalComponente() { document.getElementById('modal-comp').style.display = 'flex'; }
+        function fecharModalComp() { document.getElementById('modal-comp').style.display = 'none'; document.getElementById('nc-nome').value = ""; }
+        function abrirModal() { document.getElementById('form').reset(); document.getElementById('lista-inputs').innerHTML = ""; document.getElementById('id').value = ""; document.getElementById('modal').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+
+        function addLinha(n="", s="", c="") {
+            const div = document.createElement('div');
+            div.className = 'comp-row';
+            div.innerHTML = `<input type="text" class="in-c" value="${c}" placeholder="Função" list="sugestoes-funcao" style="flex:1"><input type="text" class="in-n" value="${n}" placeholder="Peça" style="flex:2"><input type="text" class="in-s" value="${s}" placeholder="SAP" style="flex:0.8"><button type="button" onclick="this.parentElement.remove()" style="border:none; background:none; color:red;">✖</button>`;
+            document.getElementById('lista-inputs').appendChild(div);
+        }
+
+        function prepararEdicao(doc) {
+            abrirModal();
+            document.getElementById('id').value = doc.$id;
+            document.getElementById('equipamento').value = doc.equipamento;
+            document.getElementById('fabricante').value = doc.fabricante;
+            document.getElementById('modelo').value = doc.modelo;
+            document.getElementById('sap').value = doc.codigoSAP || "";
+            if(doc.componentes_nomes_raw) {
+                const ns = doc.componentes_nomes_raw.split('|');
+                const ss = doc.componentes_saps_raw.split('|');
+                const cs = doc.componentes_categorias_raw ? doc.componentes_categorias_raw.split('|') : [];
+                ns.forEach((n, i) => addLinha(n, ss[i], cs[i]));
+            }
+        }
+
+        document.getElementById('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rows = document.querySelectorAll('.comp-row');
+            const ns = [], ss = [], cs = [];
+            rows.forEach(row => {
+                const n = row.querySelector('.in-n').value.trim();
+                const c = row.querySelector('.in-c').value.trim();
+                if(n) { ns.push(n); ss.push(row.querySelector('.in-s').value.trim() || "---"); cs.push(c || "Geral"); }
+            });
+            const data = { equipamento: document.getElementById('equipamento').value, fabricante: document.getElementById('fabricante').value, modelo: document.getElementById('modelo').value, codigoSAP: document.getElementById('sap').value, componentes_nomes_raw: ns.join('|'), componentes_saps_raw: ss.join('|'), componentes_categorias_raw: cs.join('|') };
+            const id = document.getElementById('id').value;
+            try {
+                if(id) await databases.updateDocument(DB, COL, id, data);
+                else await databases.createDocument(DB, COL, ID.unique(), data);
+                fecharModal(); carregar();
+            } catch (err) { alert("Erro ao salvar."); }
+        });
+
+        carregar();
+    </script>
+</body>
+</html>

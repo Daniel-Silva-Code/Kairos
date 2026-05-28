@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda Integrada Appwrite</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: #f0f2f5; padding: 10px; display: flex; justify-content: center; font-size: 14px; min-height: 100vh; }
+    
+    .app-container { display: flex; width: 100%; max-width: 950px; gap: 12px; }
+    
+    /* PAINEL ESQUERDO */
+    .sidebar { flex: 1; max-width: 250px; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 10px; }
+    .sidebar h3 { font-size: 1rem; color: #333; margin-bottom: 4px; }
+    
+    .sidebar-input { display: flex; gap: 4px; }
+    .sidebar-input input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; outline: none; }
+    .sidebar-input button { background: #03D2D3; color: white; border: none; padding: 0 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    
+    .pool-tasks { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; min-height: 150px; padding: 2px; }
+    
+    /* Cards alimentados pelo banco de dados */
+    .drag-card { background: #fff3cd; color: #856404; padding: 8px; border-radius: 6px; border-left: 4px solid #ffc107; font-weight: 500; cursor: grab; user-select: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .drag-card.repetitive-card { background: #e2f0d9; color: #385723; border-left-color: #70ad47; }
+    .drag-card button { background: transparent; color: #dc3545; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; padding: 0 4px; }
+    .drag-card.selected-mobile { border: 2px solid #03D2D3; background: #e6faff; }
+    
+    .card-info { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 4px; }
+    .card-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    
+    .rep-check-label { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #666; cursor: pointer; font-weight: normal; width: max-content; }
+    .rep-check-label input { width: 13px; height: 13px; accent-color: #03D2D3; cursor: pointer; }
+
+    /* PAINEL DIREITO (CALENDÁRIO) */
+    .calendar-box { flex: 2; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+    
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .header h2 { font-size: 1.1rem; color: #333; text-transform: capitalize; }
+    .header button { background: #03D2D3; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    
+    .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; color: #555; font-size: 0.8rem; padding-bottom: 6px; }
+    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; flex: 1; }
+    
+    .day-cell { min-height: 100px; background: #fff; border: 1px solid #e9ecef; border-radius: 6px; padding: 4px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; }
+    .day-cell.empty { background: #fdfdfd; border: 1px solid transparent; }
+    .day-cell.drag-over { background: #e6faff !important; border: 1px dashed #02A0A1; }
+    
+    .day-number { font-size: 0.8rem; font-weight: bold; color: #444; text-align: right; margin-bottom: 4px; }
+    .day-cell.today { border: 1px solid #03D2D3; background: #f0fcfc; }
+    .day-cell.today .day-number { color: #02A0A1; }
+    
+    .mini-tasks { display: flex; flex-direction: column; gap: 3px; overflow-y: auto; max-height: 70px; }
+    
+    .task-tag { background: #fff2cc; color: #b2a100; font-size: 0.65rem; padding: 2px 4px; border-radius: 3px; border-left: 3px solid #ffc107; font-weight: 500; display: flex; justify-content: space-between; align-items: center; gap: 2px; }
+    .task-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    
+    .task-tag.completed { background: #d4edda; color: #155724; border-left-color: #28a745; text-decoration: line-through; opacity: 0.7; }
+    
+    .tag-actions { display: flex; gap: 4px; font-size: 0.8rem; }
+    .tag-actions .check-btn { color: #28a745; cursor: pointer; font-weight: bold; }
+    .tag-actions .remove-btn { color: #dc3545; cursor: pointer; font-weight: bold; }
+
+    @media (max-width: 650px) {
+      .app-container { flex-direction: column; }
+      .sidebar { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <div class="sidebar">
+      <h3>Banco de Atividades</h3>
+      <div class="sidebar-input">
+        <input type="text" id="new-task-input" placeholder="Nova atividade..." autocomplete="off">
+        <button id="add-pool-btn">+</button>
+      </div>
+      <small style="color: #888; font-size: 0.73rem;">Atividades vindas do banco. Marque 'Repetitiva' para impedir que sumam ao concluir.</small>
+      <div class="pool-tasks" id="pool-container"></div>
+    </div>
+
+    <div class="calendar-box">
+      <div class="header">
+        <button id="prev">&lt;</button>
+        <h2 id="month-year"></h2>
+        <button id="next">&gt;</button>
+      </div>
+      <div class="weekdays">
+        <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+      </div>
+      <div class="days-grid" id="days-container"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const { Client, Databases, Query, ID } = Appwrite; 
+
+    const client = new Client()
+        .setEndpoint('https://syd.cloud.appwrite.io/v1')
+        .setProject('69e0dbe500145c5ba8c3');
+
+    const databases = new Databases(client);
+    const DB_ID = "69e0def3001636121611";
+    const COL_TAREFAS = "litarefas";
+
+    let linhaAtiva = 9;
+    let agendaData = {}; 
+    
+    // Arrays de controle local
+    let poolTasks = []; 
+    let mapaRepetitivas = JSON.parse(localStorage.getItem('appwrite_mapa_repetitivas')) || {};
+    let mobileSelectedTaskIndex = null;
+    let currentDate = new Date();
+
+    const monthYearEl = document.getElementById('month-year');
+    const daysContainer = document.getElementById('days-container');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const newTaskInput = document.getElementById('new-task-input');
+    const addPoolBtn = document.getElementById('add-pool-btn');
+    const poolContainer = document.getElementById('pool-container');
+
+    // 1. CARGA DE DADOS DO BANCO DO APPWRITE
+    async function buscarDadosDoBanco() {
+      try {
+        console.log("Buscando atualizações no Appwrite para a linha:", linhaAtiva);
+        const response = await databases.listDocuments(DB_ID, COL_TAREFAS, [
+            Query.equal('linha', String(linhaAtiva)),
+            Query.limit(100)
+        ]);
+
+        agendaData = {};
+
+        response.documents.forEach(doc => {
+            const dateKey = doc.data; 
+            if (!dateKey) return;
+
+            if (!agendaData[dateKey]) agendaData[dateKey] = [];
+            
+            if (!agendaData[dateKey].some(t => t.id === doc.$id)) {
+                agendaData[dateKey].push({
+                    id: doc.$id,
+                    text: doc.descritivo || "",
+                    completed: doc.status === "Concluída"
+                });
+            }
+        });
+
+        verificarRegraRemocaoPool();
+        renderCalendar();
+      } catch (error) {
+        console.error("Erro ao buscar dados do Appwrite:", error);
+      }
+    }
+
+    // 2. MÓDULO INTELIGENTE QUE GERA A LISTA DA ESQUERDA BASEADO NO BANCO
+    function verificarRegraRemocaoPool() {
+      let dbDescriptions = new Set();
+      let pendingDescriptions = new Set();
+
+      // Mapeia tudo que está atualmente gravado no banco de dados
+      for (const key in agendaData) {
+        agendaData[key].forEach(task => {
+          dbDescriptions.add(task.text);
+          if (!task.completed) {
+            pendingDescriptions.add(task.text); // Salva quais textos possuem pendências
+          }
+        });
+      }
+
+      // Mantém no pool temporário itens criados manualmente que ainda não foram associados a nenhum dia
+      let novosPoolTasks = poolTasks.filter(t => !dbDescriptions.has(t.text));
+
+      // Importa dinamicamente as atividades do banco de dados aplicando as regras de filtragem
+      dbDescriptions.forEach(text => {
+        let isRepetitive = mapaRepetitivas[text] || false;
+        let isPending = pendingDescriptions.has(text);
+        
+        // REGRA PRINCIPAL: Exibe se houver instância pendente OU se estiver marcado como repetitiva
+        if (isPending || isRepetitive) {
+          novosPoolTasks.push({
+            text: text,
+            repetitive: isRepetitive
+          });
+        }
+      });
+
+      // Remove qualquer possível duplicidade de indexação de string
+      let vistos = new Set();
+      poolTasks = novosPoolTasks.filter(t => {
+        if (vistos.has(t.text)) return false;
+        vistos.add(t.text);
+        return true;
+      });
+
+      renderPool();
+    }
+
+    // 3. VINCULAR CARD AO CALENDÁRIO
+    async function copiarTarefaParaDia(text, dateKey) {
+      console.log(`Iniciando vínculo da atividade: "${text}" no dia: ${dateKey}`);
+      if (!agendaData[dateKey]) agendaData[dateKey] = [];
+      
+      const tempId = "temp-" + Date.now();
+      agendaData[dateKey].push({
+          id: tempId,
+          text: text,
+          completed: false
+      });
+      renderCalendar();
+
+      try {
+        const doc = await databases.createDocument(DB_ID, COL_TAREFAS, ID.unique(), {
+            descritivo: text,
+            status: "Pendente",
+            data: dateKey,      
+            linha: String(linhaAtiva)
+        });
+        
+        const tarefaLocal = agendaData[dateKey].find(t => t.id === tempId);
+        if (tarefaLocal) tarefaLocal.id = doc.$id;
+        
+        verificarRegraRemocaoPool();
+      } catch (error) {
+        console.error("Erro ao salvar no Appwrite:", error);
+        agendaData[dateKey] = agendaData[dateKey].filter(t => t.id !== tempId);
+        renderCalendar();
+      }
+    }
+
+    // 4. ALTERAR STATUS (CHECK IN-GRID)
+    window.toggleCompleteTask = async function(e, dateKey, index) {
+      e.stopPropagation();
+      const task = agendaData[dateKey][index];
+      const novoStatus = task.completed ? "Pendente" : "Concluída";
+
+      task.completed = !task.completed;
+      renderCalendar();
+      verificarRegraRemocaoPool();
+
+      try {
+        await databases.updateDocument(DB_ID, COL_TAREFAS, task.id, {
+            status: novoStatus
+        });
+      } catch (error) {
+        console.error("Erro ao mudar status:", error);
+        task.completed = !task.completed;
+        renderCalendar();
+        verificarRegraRemocaoPool();
+      }
+    };
+
+    // 5. REMOVER INSTÂNCIA DO CALENDÁRIO
+    window.deleteCalendarTask = async function(e, dateKey, index) {
+      e.stopPropagation();
+      const task = agendaData[dateKey][index];
+
+      const backup = agendaData[dateKey][index];
+      agendaData[dateKey].splice(index, 1);
+      renderCalendar();
+      verificarRegraRemocaoPool();
+
+      try {
+        await databases.deleteDocument(DB_ID, COL_TAREFAS, task.id);
+      } catch (error) {
+        console.error("Erro ao deletar documento:", error);
+        agendaData[dateKey].splice(index, 0, backup);
+        renderCalendar();
+        verificarRegraRemocaoPool();
+      }
+    };
+
+    // 6. ALTERNAR MODALIDADE REPETITIVA DENTRO DO CARD
+    window.toggleRepetitiveCard = function(e, index) {
+      e.stopPropagation();
+      const taskText = poolTasks[index].text;
+      mapaRepetitivas[taskText] = e.target.checked;
+      localStorage.setItem('appwrite_mapa_repetitivas', JSON.stringify(mapaRepetitivas));
+      
+      buscarDadosDoBanco(); // Recalcula a árvore de exibição baseada na nova regra
+    };
+
+    // 7. RENDERIZADORES
+    function renderPool() {
+      poolContainer.innerHTML = '';
+      poolTasks.forEach((taskObj, index) => {
+        const card = document.createElement('div');
+        card.classList.add('drag-card');
+        if (taskObj.repetitive) card.classList.add('repetitive-card');
+        if (mobileSelectedTaskIndex === index) card.classList.add('selected-mobile');
+        
+        card.setAttribute('draggable', 'true');
+        
+        card.innerHTML = `
+          <div class="card-info">
+            <span>${taskObj.text}</span>
+            <label class="rep-check-label" onclick="event.stopPropagation();">
+              <input type="checkbox" ${taskObj.repetitive ? 'checked' : ''} onchange="toggleRepetitiveCard(event, ${index})">
+              Repetitiva
+            </label>
+          </div>
+          <button onclick="deletePoolTemplate(event, ${index})">&times;</button>
+        `;
+
+        card.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', JSON.stringify({ text: taskObj.text }));
+        });
+
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          mobileSelectedTaskIndex = (mobileSelectedTaskIndex === index) ? null : index;
+          renderPool();
+        });
+
+        poolContainer.appendChild(card);
+      });
+    }
+
+    // Criação manual (Entra como temporária até ser arrastada e persistida no Appwrite)
+    function addPoolTemplate() {
+      const text = newTaskInput.value.trim();
+      if (!text) return;
+      
+      if (!poolTasks.some(t => t.text === text)) {
+        poolTasks.push({ text: text, repetitive: false });
+      }
+      
+      newTaskInput.value = '';
+      renderPool();
+    }
+
+    // Exclusão total: Limpa o template e remove TODAS as instâncias do calendário vinculadas a esse nome
+    window.deletePoolTemplate = async function(e, index) {
+      e.stopPropagation();
+      const taskText = poolTasks[index].text;
+      
+      if (confirm(`Deseja remover todas as instâncias de "${taskText}" do calendário e do banco?`)) {
+        let idsParaDeletar = [];
+        for (const key in agendaData) {
+          agendaData[key].forEach(t => {
+            if (t.text === taskText) idsParaDeletar.push(t.id);
+          });
+        }
+
+        delete mapaRepetitivas[taskText];
+        localStorage.setItem('appwrite_mapa_repetitivas', JSON.stringify(mapaRepetitivas));
+        poolTasks = poolTasks.filter(t => t.text !== taskText);
+
+        for (let id of idsParaDeletar) {
+          if (!id.startsWith('temp-')) {
+            try { await databases.deleteDocument(DB_ID, COL_TAREFAS, id); } catch(err) {}
+          }
+        }
+        buscarDadosDoBanco();
+      }
+    };
+
+    function renderCalendar() {
+      daysContainer.innerHTML = '';
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      monthYearEl.innerText = currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('day-cell', 'empty');
+        daysContainer.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('day-cell');
+
+        if (day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) {
+          dayCell.classList.add('today');
+        }
+
+        const numDiv = document.createElement('div');
+        numDiv.classList.add('day-number');
+        numDiv.innerText = day;
+        dayCell.appendChild(numDiv);
+
+        const tasksDiv = document.createElement('div');
+        tasksDiv.classList.add('mini-tasks');
+
+        if (agendaData[dateKey]) {
+          agendaData[dateKey].forEach((task, index) => {
+            const tag = document.createElement('div');
+            tag.classList.add('task-tag');
+            if (task.completed) tag.classList.add('completed');
+
+            tag.innerHTML = `
+              <span>${task.text}</span>
+              <div class="tag-actions">
+                <span class="check-btn" title="Concluir" onclick="toggleCompleteTask(event, '${dateKey}', ${index})">✓</span>
+                <span class="remove-btn" title="Excluir" onclick="deleteCalendarTask(event, '${dateKey}', ${index})">&times;</span>
+              </div>
+            `;
+            tasksDiv.appendChild(tag);
+          });
+        }
+        dayCell.appendChild(tasksDiv);
+
+        dayCell.addEventListener('dragover', (e) => { e.preventDefault(); dayCell.classList.add('drag-over'); });
+        dayCell.addEventListener('dragleave', () => { dayCell.classList.remove('drag-over'); });
+        dayCell.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dayCell.classList.remove('drag-over');
+          try {
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            copiarTarefaParaDia(data.text, dateKey);
+          } catch(err) {}
+        });
+
+        dayCell.addEventListener('click', () => {
+          if (mobileSelectedTaskIndex !== null) {
+            const taskText = poolTasks[mobileSelectedTaskIndex].text;
+            copiarTarefaParaDia(taskText, dateKey);
+            mobileSelectedTaskIndex = null;
+            renderPool();
+          }
+        });
+
+        daysContainer.appendChild(dayCell);
+      }
+    }
+
+    // 8. SUBSCRIPTION REALTIME PAYLOAD MAPPING
+    client.subscribe(`databases.${DB_ID}.collections.${COL_TAREFAS}.documents`, (response) => {
+        const doc = response.payload;
+        const evento = response.events[0];
+        const dateKey = doc.data;
+
+        if (doc.linha !== String(linhaAtiva)) return;
+        if (!dateKey) return;
+
+        if (evento.includes('.create')) {
+            if (!agendaData[dateKey]) agendaData[dateKey] = [];
+            if (!agendaData[dateKey].some(t => t.id === doc.$id)) {
+                agendaData[dateKey] = agendaData[dateKey].filter(t => !t.id.startsWith('temp-') || t.text !== doc.descritivo);
+                agendaData[dateKey].push({
+                    id: doc.$id,
+                    text: doc.descritivo || "",
+                    completed: doc.status === "Concluída"
+                });
+            }
+        } else if (evento.includes('.update')) {
+            if (agendaData[dateKey]) {
+                const task = agendaData[dateKey].find(t => t.id === doc.$id);
+                if (task) {
+                    task.completed = doc.status === "Concluída";
+                    task.text = doc.descritivo || "";
+                }
+            }
+        } else if (evento.includes('.delete')) {
+            if (agendaData[dateKey]) {
+                agendaData[dateKey] = agendaData[dateKey].filter(t => t.id !== doc.$id);
+                if (agendaData[dateKey].length === 0) delete agendaData[dateKey];
+            }
+        }
+
+        verificarRegraRemocaoPool();
+        renderCalendar();
+    });
+
+    addPoolBtn.addEventListener('click', addPoolTemplate);
+    newTaskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addPoolTemplate(); });
+    prevBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); buscarDadosDoBanco(); });
+    nextBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); buscarDadosDoBanco(); });
+
+    buscarDadosDoBanco();
+  </script>
+</body>
+</html>
